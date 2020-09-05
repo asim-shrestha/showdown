@@ -7,7 +7,6 @@ public class Player : MonoBehaviour {
 	[SerializeField] float jumpSpeed = 7f;
 	[SerializeField] int maxJumps = 2;
 	[SerializeField] int jumpsAvailable;
-	[SerializeField] GameObject feet;
 
 	private Rigidbody2D rb;
 	private BoxCollider2D boxCollider;
@@ -35,6 +34,7 @@ public class Player : MonoBehaviour {
 	// Draws a ray from the origin of the player downwards
 	// Returns whether or not the ray hits the ground and the player is not moving upward
 	private bool isGrounded() {
+		// TODO remove debug
 		Debug.DrawRay(boxCollider.bounds.center, boxCollider.bounds.size / 2 * Vector2.down, Color.black);
 		RaycastHit2D raycast = Physics2D.BoxCast(
 			boxCollider.bounds.center,
