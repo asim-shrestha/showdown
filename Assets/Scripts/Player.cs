@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Cinemachine;
 using UnityEngine;
 
 public class Player : MonoBehaviour {
@@ -16,6 +17,13 @@ public class Player : MonoBehaviour {
 		rb = GetComponent<Rigidbody2D>();
 		boxCollider = GetComponent<BoxCollider2D>();
 		jumpsAvailable = maxJumps;
+		connectToCamera();
+	}
+
+	private void connectToCamera() {
+		CinemachineStateDrivenCamera camera = FindObjectOfType<CinemachineStateDrivenCamera>();
+		camera.Follow = transform;
+		camera.LookAt = transform;
 	}
 
 	// Update is called once per frame
@@ -35,13 +43,13 @@ public class Player : MonoBehaviour {
 	// Returns whether or not the ray hits the ground and the player is not moving upward
 	private bool isGrounded() {
 		// TODO remove debug
-		Debug.DrawRay(boxCollider.bounds.center, boxCollider.bounds.size / 2 * Vector2.down, Color.black);
+		Debug.DrawRay(boxCollider.bounds.center, boxCollider.bounds.size.x / 2 * Vector2.down, Color.black);
 		RaycastHit2D raycast = Physics2D.BoxCast(
 			boxCollider.bounds.center,
-			boxCollider.bounds.size / 2,
-			0f,
+			boxCollider.bounds.size,
+			0f, // Rotation
 			Vector2.down,
-			1f,
+			boxCollider.bounds.size.x / 2,
 			LayerMask.GetMask("Ground")
 		);
 		return raycast.collider != null && rb.velocity.y <= 0;
