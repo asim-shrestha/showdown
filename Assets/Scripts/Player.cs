@@ -20,6 +20,7 @@ public class Player : NetworkBehaviour {
 		boxCollider = GetComponent<BoxCollider2D>();
 		jumpsAvailable = maxJumps;
 		ConnectClientToCamera();
+		DisablePhysicsIfOtherPlayer();
 	}
 
 	private void ConnectClientToCamera() {
@@ -29,6 +30,13 @@ public class Player : NetworkBehaviour {
 		CinemachineStateDrivenCamera camera = FindObjectOfType<CinemachineStateDrivenCamera>();
 		camera.Follow = transform;
 		camera.LookAt = transform;
+	}
+
+	private void DisablePhysicsIfOtherPlayer() {
+		// Kinematic rigidbodys do not undergo physics calculations
+		// This disables physics if the player belongs to a different client
+		// Doing this will remove jittery players but also remove basic player - player collision
+		rb.isKinematic = !hasAuthority;
 	}
 
 	// Update is called once per frame
