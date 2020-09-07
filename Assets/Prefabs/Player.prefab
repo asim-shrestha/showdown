@@ -204,7 +204,7 @@ MonoBehaviour:
   jumpSpeed: 11
   maxJumps: 2
   jumpsAvailable: 0
-  dust: {fileID: 5409803473835196685}
+  dustParticles: {fileID: 5741215150046993374}
 --- !u!114 &6083185996628245252
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -296,13 +296,13 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f287bf71e463ecb6499242e07dfaa7ef, type: 3}
+--- !u!1 &5741215150046993374 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 401661667691938386, guid: f287bf71e463ecb6499242e07dfaa7ef, type: 3}
+  m_PrefabInstance: {fileID: 5349741900763961740}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &2543039434040193013 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7598884350499337849, guid: f287bf71e463ecb6499242e07dfaa7ef, type: 3}
-  m_PrefabInstance: {fileID: 5349741900763961740}
-  m_PrefabAsset: {fileID: 0}
---- !u!198 &5409803473835196685 stripped
-ParticleSystem:
-  m_CorrespondingSourceObject: {fileID: 84832213942671489, guid: f287bf71e463ecb6499242e07dfaa7ef, type: 3}
   m_PrefabInstance: {fileID: 5349741900763961740}
   m_PrefabAsset: {fileID: 0}

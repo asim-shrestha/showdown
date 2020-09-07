@@ -9,7 +9,8 @@ public class Player : NetworkBehaviour {
 	[SerializeField] float jumpSpeed = 7f;
 	[SerializeField] int maxJumps = 2;
 	[SerializeField] int jumpsAvailable;
-	[SerializeField] private ParticleSystem dust;
+	// GameObject instead of particle system to pass into a server command
+	[SerializeField] private GameObject dustParticles;
 
 	private Rigidbody2D rb;
 	private BoxCollider2D boxCollider;
@@ -82,9 +83,20 @@ public class Player : NetworkBehaviour {
 			Vector2 jumpVelocity = new Vector2(rb.velocity.x, jumpSpeed);
 			rb.velocity = jumpVelocity;
 			if (jumpsAvailable == maxJumps) {
-				dust.Play();
+				CmdPlayDustParticles();
 			}
 			jumpsAvailable--;
 		}
+	}
+
+	// Run on server so every player can see the dust particles
+	[Command]
+	private void CmdPlayDustParticles() {
+		ClientPlayDustParticles();
+	}
+
+	[ClientRpc]
+	private void ClientPlayDustParticles() {
+		dustParticles.GetComponent<ParticleSystem>().Play();
 	}
 }
