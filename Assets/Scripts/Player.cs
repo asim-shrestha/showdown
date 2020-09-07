@@ -1,8 +1,10 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Cinemachine;
+using Mirror;
 using UnityEngine;
 
-public class Player : MonoBehaviour {
+public class Player : NetworkBehaviour {
 	[SerializeField] float movementSpeed = 7f;
 	[SerializeField] float jumpSpeed = 7f;
 	[SerializeField] int maxJumps = 2;
@@ -11,20 +13,31 @@ public class Player : MonoBehaviour {
 
 	private Rigidbody2D rb;
 	private BoxCollider2D boxCollider;
-	
 
 	// Start is called before the first frame update
 	void Start() {
 		rb = GetComponent<Rigidbody2D>();
 		boxCollider = GetComponent<BoxCollider2D>();
 		jumpsAvailable = maxJumps;
+		ConnectClientToCamera();
+	}
+
+	private void ConnectClientToCamera() {
+		// Ensure the player belongs to this client
+		if (!hasAuthority) { return; }
+
+		CinemachineStateDrivenCamera camera = FindObjectOfType<CinemachineStateDrivenCamera>();
+		camera.Follow = transform;
+		camera.LookAt = transform;
 	}
 
 	// Update is called once per frame
 	void Update() {
-		handleResetJumpsAvailable();
-		handleJump();
-		handleMovement();
+		if (hasAuthority) {
+			handleResetJumpsAvailable();
+			handleJump();
+			handleMovement();
+		}
 	}
 
 	private void handleResetJumpsAvailable() {
