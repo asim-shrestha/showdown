@@ -7,9 +7,11 @@ public class Player : MonoBehaviour {
 	[SerializeField] float jumpSpeed = 7f;
 	[SerializeField] int maxJumps = 2;
 	[SerializeField] int jumpsAvailable;
+	[SerializeField] private ParticleSystem dust;
 
 	private Rigidbody2D rb;
 	private BoxCollider2D boxCollider;
+	
 
 	// Start is called before the first frame update
 	void Start() {
@@ -58,6 +60,9 @@ public class Player : MonoBehaviour {
 		} else if (Input.GetButtonDown("Jump")) {
 			Vector2 jumpVelocity = new Vector2(rb.velocity.x, jumpSpeed);
 			rb.velocity = jumpVelocity;
+			if (jumpsAvailable == maxJumps) {
+				dust.Play();
+			}
 			jumpsAvailable--;
 		}
 	}
