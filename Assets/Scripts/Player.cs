@@ -8,7 +8,6 @@ public class Player : MonoBehaviour {
 	[SerializeField] int maxJumps = 2;
 	[SerializeField] int jumpsAvailable;
 	[SerializeField] private ParticleSystem dust;
-	bool isNotYetLanded;
 
 	private Rigidbody2D rb;
 	private BoxCollider2D boxCollider;
@@ -61,7 +60,7 @@ public class Player : MonoBehaviour {
 		} else if (Input.GetButtonDown("Jump")) {
 			Vector2 jumpVelocity = new Vector2(rb.velocity.x, jumpSpeed);
 			rb.velocity = jumpVelocity;
-			if (jumpsAvailable >= 2) {
+			if (jumpsAvailable == maxJumps) {
 				dust.Play();
 			}
 			jumpsAvailable--;
