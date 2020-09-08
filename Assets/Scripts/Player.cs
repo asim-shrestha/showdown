@@ -59,16 +59,18 @@ public class Player : NetworkBehaviour {
 	// Returns whether or not the ray hits the ground and the player is not moving upward
 	private bool isGrounded() {
 		// TODO remove debug
+		float extraHeight = 0.1f; // Used so that the boxcast slightly extends past the plaer
 		Debug.DrawRay(boxCollider.bounds.center, boxCollider.bounds.size / 2 * Vector2.down, Color.black);
 		RaycastHit2D raycast = Physics2D.BoxCast(
 			boxCollider.bounds.center,
-			boxCollider.bounds.size / 2,
+			boxCollider.bounds.size,
 			0f,
 			Vector2.down,
-			1f,
+			extraHeight,
 			LayerMask.GetMask("Ground")
 		);
-		return raycast.collider != null && rb.velocity.y <= 0;
+		float velocityEpsilon = 0.01f;
+		return raycast.collider != null && Mathf.Abs(rb.velocity.y) <= velocityEpsilon;
 	}
 
 	private void handleMovement() {
