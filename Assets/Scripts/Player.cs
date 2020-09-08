@@ -3,14 +3,25 @@ using System.Collections.Generic;
 using Cinemachine;
 using Mirror;
 using UnityEngine;
+using static GroundCheck;
 
 public class Player : NetworkBehaviour {
 	[SerializeField] float movementSpeed = 7f;
 	[SerializeField] float jumpSpeed = 7f;
 	[SerializeField] int maxJumps = 2;
 	[SerializeField] int jumpsAvailable;
+	[SerializeField] float wallRideTriggerSpeed = 0.1f; //upward direction
+	[SerializeField] float wallRideSpeed = -0.1f; //downward direction
+	
 	// GameObject instead of particle system to pass into a server command
 	[SerializeField] private GameObject dustParticles;
+	
+	[SerializeField] private GameObject groundCheck;
+	private GroundCheck groundCheckScript;
+	[SerializeField] private GameObject LeftWallCheck;
+	private WallCheck leftWallCheckScript;
+	[SerializeField] private GameObject RightWallCheck;
+	private WallCheck rightWallCheckScript;
 
 	private Rigidbody2D rb;
 	private BoxCollider2D boxCollider;
@@ -20,6 +31,12 @@ public class Player : NetworkBehaviour {
 		rb = GetComponent<Rigidbody2D>();
 		boxCollider = GetComponent<BoxCollider2D>();
 		jumpsAvailable = maxJumps;
+
+		//load scripts from groundCheck and LeftWallCheck gameobjects
+		groundCheckScript = groundCheck.GetComponent<GroundCheck>();
+		leftWallCheckScript = LeftWallCheck.GetComponent<WallCheck>();
+		rightWallCheckScript = RightWallCheck.GetComponent<WallCheck>();
+
 		ConnectClientToCamera();
 		DisablePhysicsIfOtherPlayer();
 	}
@@ -43,34 +60,20 @@ public class Player : NetworkBehaviour {
 	// Update is called once per frame
 	void Update() {
 		if (hasAuthority) {
-			handleResetJumpsAvailable();
+			Debug.Log(GetJumpState());
+			handleLanding();
 			handleJump();
+			handleWallRide();
 			handleMovement();
 		}
 	}
 
-	private void handleResetJumpsAvailable() {
-		if (isGrounded()) {
+	private void handleLanding() {
+		if (GetJumpState() == GroundCheck.JumpState.LANDED) {
 			jumpsAvailable = maxJumps;
+			CmdPlayDustParticles();
+			SetJumpState(GroundCheck.JumpState.ONGROUND);
 		}
-	}
-
-	// Draws a ray from the origin of the player downwards
-	// Returns whether or not the ray hits the ground and the player is not moving upward
-	private bool isGrounded() {
-		// TODO remove debug
-		float extraHeight = 0.1f; // Used so that the boxcast slightly extends past the plaer
-		Debug.DrawRay(boxCollider.bounds.center, boxCollider.bounds.size / 2 * Vector2.down, Color.black);
-		RaycastHit2D raycast = Physics2D.BoxCast(
-			boxCollider.bounds.center,
-			boxCollider.bounds.size,
-			0f,
-			Vector2.down,
-			extraHeight,
-			LayerMask.GetMask("Ground")
-		);
-		float velocityEpsilon = 0.01f;
-		return raycast.collider != null && Mathf.Abs(rb.velocity.y) <= velocityEpsilon;
 	}
 
 	private void handleMovement() {
@@ -81,13 +84,29 @@ public class Player : NetworkBehaviour {
 	private void handleJump() {
 		if (jumpsAvailable <= 0) {
 			return;
-		} else if (Input.GetButtonDown("Jump")) {
+		}
+		if (Input.GetButtonDown("Jump")) {
 			Vector2 jumpVelocity = new Vector2(rb.velocity.x, jumpSpeed);
 			rb.velocity = jumpVelocity;
-			if (jumpsAvailable == maxJumps) {
-				CmdPlayDustParticles();
-			}
 			jumpsAvailable--;
+			if (GetJumpState() == GroundCheck.JumpState.FALLING) {
+				jumpsAvailable--;
+				SetJumpState(GroundCheck.JumpState.INAIR);
+			}
+		}
+	}
+
+	private void handleWallRide() {
+		if ((GetIsOnLeftWall() && Input.GetAxisRaw("Horizontal") < 0) ||
+			(GetIsOnRightWall() && Input.GetAxisRaw("Horizontal") > 0)) {
+			if (rb.velocity.y < wallRideTriggerSpeed) {
+				SetJumpState(GroundCheck.JumpState.LANDED);
+				CmdPlayDustParticles();
+				if (rb.velocity.y < wallRideSpeed) {
+					Vector2 slideVelocity = new Vector2(rb.velocity.x, wallRideSpeed);
+					rb.velocity = slideVelocity;
+				}
+			}
 		}
 	}
 
@@ -101,4 +120,22 @@ public class Player : NetworkBehaviour {
 	private void ClientPlayDustParticles() {
 		dustParticles.GetComponent<ParticleSystem>().Play();
 	}
+
+	// checks if the small groundcheck collision box below player is triggered.
+	private JumpState GetJumpState() {
+		return groundCheckScript.GetJumpState();
+	}
+
+	private void SetJumpState(JumpState js) {
+		groundCheckScript.SetJumpState(js);
+	}
+
+	private bool GetIsOnLeftWall() {
+		return leftWallCheckScript.GetIsOnWall();
+	}
+
+	private bool GetIsOnRightWall() {
+		return rightWallCheckScript.GetIsOnWall();
+	}
+
 }
