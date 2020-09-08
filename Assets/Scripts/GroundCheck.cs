@@ -28,11 +28,15 @@ public class GroundCheck : MonoBehaviour
 		playerJumpState = js;
 	}
 
-	void OnTriggerEnter2D(Collider2D col) {
-		SetJumpState(JumpState.LANDED);
+	void OnTriggerEnter2D(Collider2D other) {
+		if (other.gameObject.layer == LayerMask.NameToLayer ("Ground")) {
+			SetJumpState(JumpState.LANDED);
+		}
 	}
 
-	void OnTriggerExit2D(Collider2D col) {
-		SetJumpState(JumpState.FALLING);
+	void OnTriggerExit2D(Collider2D other) {
+		if (other.gameObject.layer == LayerMask.NameToLayer ("Ground")) {
+			SetJumpState(JumpState.FALLING);
+		}
 	}
 }

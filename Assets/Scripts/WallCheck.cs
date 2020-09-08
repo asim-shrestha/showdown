@@ -16,11 +16,15 @@ public class WallCheck : MonoBehaviour
 		return isOnWall;
 	}
 
-	void OnTriggerEnter2D(Collider2D col) {
-		isOnWall = true;
+	void OnTriggerEnter2D(Collider2D other) {
+		if (other.gameObject.layer == LayerMask.NameToLayer ("Ground")) {
+			isOnWall = true;
+		}
 	}
 
-	void OnTriggerExit2D(Collider2D col) {
-		isOnWall = false;
+	void OnTriggerExit2D(Collider2D other) {
+		if (other.gameObject.layer == LayerMask.NameToLayer ("Ground")) {
+			isOnWall = false;
+		}
 	}
 }
