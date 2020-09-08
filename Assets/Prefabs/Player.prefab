@@ -202,7 +202,7 @@ MonoBehaviour:
   syncInterval: 0.1
   movementSpeed: 7
   jumpSpeed: 11
-  maxJumps: 1
+  maxJumps: 2
   jumpsAvailable: 0
   dustParticles: {fileID: 5741215150046993374}
 --- !u!114 &6083185996628245252
