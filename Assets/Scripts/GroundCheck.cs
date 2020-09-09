@@ -6,37 +6,41 @@ public class GroundCheck : MonoBehaviour
 {
 	private BoxCollider2D groundCheckBoxCollider;
 	public bool hasLanded;
-	public bool isOnGround;
-	public enum JumpState {
-		LANDED,
-		ONGROUND,
-		INAIR,
-		FALLING
-	}
-	public JumpState playerJumpState;
-
+	public bool hasLeftGround;
+	
 	void Start() {
 		groundCheckBoxCollider = GetComponent<BoxCollider2D>();
-		playerJumpState = JumpState.INAIR;
+		hasLanded = false;
+		hasLeftGround = false;
 	}
 
-	public JumpState GetJumpState() {
-		return playerJumpState;
+	public bool GetHasLanded() {
+		return hasLanded;
 	}
 
-	public void SetJumpState(JumpState js) {
-		playerJumpState = js;
+	public void SetHasLanded(bool b) {
+		hasLanded = b;
+	}
+
+	public bool GetHasLeftGround() {
+		return hasLeftGround;
+	}
+
+	public void SetHasLeftGround(bool b) {
+		hasLeftGround = b;
 	}
 
 	void OnTriggerEnter2D(Collider2D other) {
 		if (other.gameObject.layer == LayerMask.NameToLayer ("Ground")) {
-			SetJumpState(JumpState.LANDED);
+			hasLanded = true;
 		}
 	}
 
 	void OnTriggerExit2D(Collider2D other) {
 		if (other.gameObject.layer == LayerMask.NameToLayer ("Ground")) {
-			SetJumpState(JumpState.FALLING);
+			hasLeftGround = true;
 		}
 	}
+
+	
 }

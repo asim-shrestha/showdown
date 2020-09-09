@@ -3,16 +3,24 @@ using System.Collections.Generic;
 using Cinemachine;
 using Mirror;
 using UnityEngine;
-using static GroundCheck;
 
 public class Player : NetworkBehaviour {
 	[SerializeField] float movementSpeed = 7f;
 	[SerializeField] float jumpSpeed = 7f;
 	[SerializeField] int maxJumps = 2;
 	[SerializeField] int jumpsAvailable;
-	[SerializeField] float wallslideTriggerSpeed = 0.1f; //upward direction
-	[SerializeField] float wallslideSpeed = -0.1f; //downward direction
-	
+	[SerializeField] float jumpDecrementThresholdSpeed = -0.05f; //gives a buffer time when falling off a cliff before jump count will decrement
+	[SerializeField] float wallSlideTriggerSpeed = 0.1f; //upward direction
+	[SerializeField] float wallSlideSpeed = -0.1f; //downward direction
+	public enum JumpState {
+		LANDED,
+		ONGROUND,
+		INAIR,
+		FALLING
+	}
+	[SerializeField] public JumpState playerJumpState;
+
+
 	// GameObject instead of particle system to pass into a server command
 	[SerializeField] private GameObject dustParticles;
 	
@@ -24,6 +32,8 @@ public class Player : NetworkBehaviour {
 	[SerializeField] private GameObject RightWallCheck;
 	private WallCheck rightWallCheckScript;
 
+	
+
 	private Rigidbody2D rb;
 	private BoxCollider2D boxCollider;
 
@@ -32,6 +42,7 @@ public class Player : NetworkBehaviour {
 		rb = GetComponent<Rigidbody2D>();
 		boxCollider = GetComponent<BoxCollider2D>();
 		jumpsAvailable = maxJumps;
+		playerJumpState = JumpState.FALLING;
 
 		//load scripts from groundCheck and LeftWallCheck gameobjects
 		groundCheckScript = groundCheck.GetComponent<GroundCheck>();
@@ -61,22 +72,27 @@ public class Player : NetworkBehaviour {
 	// Update is called once per frame
 	void Update() {
 		if (hasAuthority) {
-			Debug.Log(GetJumpState());
+			Debug.Log(playerJumpState);
 			// the order of these operations is important due to them changing the "JumpState" of the player.
-			handleLanding();
+			// checkLanding();
+			handleLanding(); // player can land either on the ground or the wall - both activate the same behaviour
 			handleJump();
-			handleWallslide();
+			handleWallSlide();
 			handleMovement();
 		}
 	}
 
 	private void handleLanding() {
-		if (GetJumpState() == GroundCheck.JumpState.LANDED) {
+		if (GetHasLanded()) {
+			playerJumpState = JumpState.LANDED;
+			SetHasLanded(false);
+		} 
+		if (playerJumpState == JumpState.LANDED) {
 			// As soon as landing has been detected, it should perform the following lines once
 			// and then immediately change the JumpState to ONGROUND, so these line won't run again.
 			jumpsAvailable = maxJumps;
 			CmdPlayDustParticles();
-			SetJumpState(GroundCheck.JumpState.ONGROUND);
+			playerJumpState = JumpState.ONGROUND;
 		}
 	}
 
@@ -89,31 +105,60 @@ public class Player : NetworkBehaviour {
 		if (jumpsAvailable <= 0) {
 			return;
 		}
+		if (GetHasLeftGround()) {
+			// If GroundCheck detects that player is no longer on firm ground and the velocity is decreasing,
+			// then the player is falling rather than jumping.
+			if (rb.velocity.y < jumpDecrementThresholdSpeed) {
+				playerJumpState = JumpState.FALLING;
+			}
+			else {
+				playerJumpState = JumpState.INAIR;
+			}
+			SetHasLeftGround(false);
+		}
+		if (GetHasPushedOffWall()) {
+			if (rb.velocity.y < jumpDecrementThresholdSpeed + wallSlideSpeed) {
+				playerJumpState = JumpState.FALLING;
+			}
+			else {
+				playerJumpState = JumpState.INAIR;
+			}
+			SetHasPushedOffWall(false);
+		}
 		if (Input.GetButtonDown("Jump")) {
 			Vector2 jumpVelocity = new Vector2(rb.velocity.x, jumpSpeed);
 			rb.velocity = jumpVelocity;
 			jumpsAvailable--;
 			// The following lines ensure that when the player falls off the edge and tries to jump, his available jumps decrements twice.
-			if (GetJumpState() == GroundCheck.JumpState.FALLING) {
+			if (playerJumpState == JumpState.FALLING) {
 				jumpsAvailable--;
-				SetJumpState(GroundCheck.JumpState.INAIR);
+				playerJumpState = JumpState.INAIR;
 			}
 		}
 	}
 
-	private void handleWallslide() {
+	private void handleWallSlide() {
 		// if player is moving left onto a left wall or moving right onto a right wall, wall sliding will activate.
-		if ((GetIsOnLeftWall() && Input.GetAxisRaw("Horizontal") < 0) ||
-			(GetIsOnRightWall() && Input.GetAxisRaw("Horizontal") > 0)) {
-			if (rb.velocity.y < wallslideTriggerSpeed) {
-				SetJumpState(GroundCheck.JumpState.LANDED);
+		if ((GetHasTouchedLeftWall() && Input.GetAxisRaw("Horizontal") < 0) ||
+			(GetHasTouchedRightWall() && Input.GetAxisRaw("Horizontal") > 0)) {
+			if (rb.velocity.y < wallSlideTriggerSpeed) {
+				playerJumpState = JumpState.LANDED;
+				Debug.Log("Landing occurred...");
 				CmdPlayDustParticles();
-				if (rb.velocity.y < wallslideSpeed) {
-					Vector2 slideVelocity = new Vector2(rb.velocity.x, wallslideSpeed);
+				if (rb.velocity.y < wallSlideSpeed) {
+					Vector2 slideVelocity = new Vector2(rb.velocity.x, wallSlideSpeed);
 					rb.velocity = slideVelocity;
 				}
 			}
 		}
+		// else if (GetHasTouchedLeftWall() || GetHasTouchedRightWall()) {
+		// 	playerJumpState = JumpState.ONGROUND;
+		// }
+
+		// if (GetHasPushedOffWall() && rb.velocity.y < jumpDecrementThresholdSpeed) {
+		// 	playerJumpState = JumpState.FALLING;
+		// 	SetHasPushedOffWall(false);
+		// }
 	}
 
 	// Run on server so every player can see the dust particles
@@ -128,20 +173,42 @@ public class Player : NetworkBehaviour {
 	}
 
 	// checks if the small groundcheck collision box below player is triggered.
-	private JumpState GetJumpState() {
-		return groundCheckScript.GetJumpState();
+	private bool GetHasLanded() {
+		return groundCheckScript.GetHasLanded();
+	}
+	
+	private void SetHasLanded(bool b) {
+		groundCheckScript.SetHasLanded(b);
 	}
 
-	private void SetJumpState(JumpState js) {
-		groundCheckScript.SetJumpState(js);
+	private bool GetHasLeftGround() {
+		return groundCheckScript.GetHasLeftGround();
 	}
 
-	private bool GetIsOnLeftWall() {
-		return leftWallCheckScript.GetIsOnWall();
+	private void SetHasLeftGround(bool b) {
+		groundCheckScript.SetHasLeftGround(b);
 	}
 
-	private bool GetIsOnRightWall() {
-		return rightWallCheckScript.GetIsOnWall();
+	private bool GetHasTouchedLeftWall() {
+		return leftWallCheckScript.GetHasTouchedWall();
+	}
+
+	private bool GetHasTouchedRightWall() {
+		return rightWallCheckScript.GetHasTouchedWall();
+	}
+
+	private void SetHasTouchedWall(bool b) {
+		leftWallCheckScript.SetHasTouchedWall(b);
+		rightWallCheckScript.SetHasTouchedWall(b);
+	}
+
+	private bool GetHasPushedOffWall() {
+		return leftWallCheckScript.GetHasTouchedWall() || rightWallCheckScript.GetHasTouchedWall();
+	}
+
+	private void SetHasPushedOffWall(bool b) {
+		rightWallCheckScript.SetHasPushedOffWall(b);
+		leftWallCheckScript.SetHasPushedOffWall(b);
 	}
 
 }
