@@ -1,13 +1,16 @@
 using System.Collections;
 using System.Collections.Generic;
+using Mirror;
 using UnityEngine;
 
-public class Laser : MonoBehaviour {
+public class Laser : NetworkBehaviour {
 	public LineRenderer lineRenderer;
+	public ParticleSystem[] LaserParticles;
+	private BoxCollider2D boxCollider;
 
-	// Start is called before the first frame update
+	// Disable on start. Will be enabled via animation
 	void Start() {
-		EnableLaser();
+		boxCollider = GetComponent<BoxCollider2D>();
 	}
 
 	// Update is called once per frame
@@ -15,11 +18,26 @@ public class Laser : MonoBehaviour {
 		transform.Rotate(new Vector3(0, 0, 1));
 	}
 
+	private void DisableParticles() {
+		foreach (ParticleSystem particleSystem in LaserParticles) {
+			particleSystem.Stop();
+		}
+	}
+
+	private void EnableParticles() {
+		foreach (ParticleSystem particleSystem in LaserParticles) {
+			particleSystem.Play();
+		}
+	}
+
+	// Called via animations
 	public void DisableLaser() {
-		lineRenderer.enabled = false;
+		DisableParticles();
+		boxCollider.enabled = false;
 	}
 
 	public void EnableLaser() {
-		lineRenderer.enabled = true;
+		EnableParticles();
+		boxCollider.enabled = true;
 	}
 }
