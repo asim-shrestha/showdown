@@ -5,21 +5,21 @@ using UnityEngine;
 public class WallCheck : MonoBehaviour
 {
 	private BoxCollider2D wallCheckBoxCollider;
-	public bool hasTouchedWall;
+	public bool isTouchingWall;
 	public bool hasPushedOffWall;
 
 	void Start() {
 		wallCheckBoxCollider = GetComponent<BoxCollider2D>();
-		hasTouchedWall = false;
+		isTouchingWall = false;
 		hasPushedOffWall = false;
 	}
 
-	public bool GetHasTouchedWall() {
-		return hasTouchedWall;
+	public bool GetIsTouchingWall() {
+		return isTouchingWall;
 	}
 
-	public void SetHasTouchedWall(bool b) {
-		hasTouchedWall = b;
+	public void SetIsTouchingWall(bool b) {
+		isTouchingWall = b;
 	}
 
 	public bool GetHasPushedOffWall() {
@@ -31,15 +31,16 @@ public class WallCheck : MonoBehaviour
 	}
 
 
-	void OnTriggerEnter2D(Collider2D other) {
+	void OnTriggerStay2D(Collider2D other) {
 		if (other.gameObject.layer == LayerMask.NameToLayer ("Ground")) {
-			hasTouchedWall = true;
+			isTouchingWall = true;
+			Debug.Log("touching a wall");
 		}
 	}
 
 	void OnTriggerExit2D(Collider2D other) {
 		if (other.gameObject.layer == LayerMask.NameToLayer ("Ground")) {
-			hasTouchedWall = false;
+			isTouchingWall = false;
 			hasPushedOffWall = true;
 		}
 	}

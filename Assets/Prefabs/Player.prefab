@@ -70,7 +70,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 57f253df6a56fa3589b32f96c3a79cf3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isOnWall: 0
+  isTouchingWall: 0
+  hasPushedOffWall: 0
 --- !u!1 &3689264963522906753
 GameObject:
   m_ObjectHideFlags: 0
@@ -142,8 +143,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   hasLanded: 0
-  isOnGround: 0
-  playerJumpState: 3
+  hasLeftGround: 0
 --- !u!1 &5349741900707771351
 GameObject:
   m_ObjectHideFlags: 0
@@ -240,7 +240,7 @@ GameObject:
   - component: {fileID: 5349741901730615650}
   - component: {fileID: 6083185996628245252}
   - component: {fileID: 6467107586168053277}
-  - component: {fileID: 3562038053273634005}
+  - component: {fileID: 3381846885463958275}
   m_Layer: 8
   m_Name: Player
   m_TagString: Untagged
@@ -367,7 +367,7 @@ MonoBehaviour:
   localPositionSensitivity: 0.01
   localRotationSensitivity: 0.01
   localScaleSensitivity: 0.01
---- !u!114 &3562038053273634005
+--- !u!114 &3381846885463958275
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -385,7 +385,9 @@ MonoBehaviour:
   jumpSpeed: 11
   maxJumps: 2
   jumpsAvailable: 0
-  wallRideSpeed: 0.1
+  jumpDecrementThresholdVelocity: -0.05
+  wallSlideTriggerVelocity: 0.1
+  wallSlideVelocity: -0.1
   dustParticles: {fileID: 5741215150046993374}
   groundCheck: {fileID: 3689264963522906753}
   LeftWallCheck: {fileID: 2882895677230905950}
@@ -460,7 +462,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 57f253df6a56fa3589b32f96c3a79cf3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isOnWall: 0
+  isTouchingWall: 0
+  hasPushedOffWall: 0
 --- !u!1001 &5349741900763961740
 PrefabInstance:
   m_ObjectHideFlags: 0
