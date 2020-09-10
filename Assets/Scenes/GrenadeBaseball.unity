@@ -232,7 +232,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   grenade: {fileID: 4093756858599987161, guid: cf7b7799f7698c962a2d0b581394037c, type: 3}
-  spawnInterval: 4
+  spawnInterval: 3
 --- !u!1001 &756094664
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -308,7 +308,7 @@ SurfaceEffector2D:
     serializedVersion: 2
     m_Bits: 4294967295
   m_Speed: 0
-  m_SpeedVariation: 4.37
+  m_SpeedVariation: 0
   m_ForceScale: 0
   m_UseContactForce: 0
   m_UseFriction: 1
