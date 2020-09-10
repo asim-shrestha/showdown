@@ -34,7 +34,6 @@ public class WallCheck : MonoBehaviour
 	void OnTriggerStay2D(Collider2D other) {
 		if (other.gameObject.layer == LayerMask.NameToLayer ("Ground")) {
 			isTouchingWall = true;
-			Debug.Log("touching a wall");
 		}
 	}
 

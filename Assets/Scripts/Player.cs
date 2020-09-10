@@ -13,17 +13,17 @@ public class Player : NetworkBehaviour {
 	[SerializeField] float wallSlideTriggerVelocity = 0.1f; //upward direction
 	[SerializeField] float wallSlideVelocity = -0.1f; //downward direction
 	bool isFalling;
+	bool isGrounded;
+	float dirFacing;
 
 	// GameObject instead of particle system to pass into a server command
 	[SerializeField] private GameObject dustParticles;
 	
 	// Ground and wall checks are performed with the following gameobjects.
-	[SerializeField] private GameObject groundCheck;
+	[SerializeField] private GameObject GroundCheck;
 	private GroundCheck groundCheckScript;
-	[SerializeField] private GameObject LeftWallCheck;
-	private WallCheck leftWallCheckScript;
-	[SerializeField] private GameObject RightWallCheck;
-	private WallCheck rightWallCheckScript;
+	[SerializeField] private GameObject WallCheck;
+	private WallCheck wallCheckScript;
 
 	private Rigidbody2D rb;
 	private BoxCollider2D boxCollider;
@@ -34,11 +34,11 @@ public class Player : NetworkBehaviour {
 		boxCollider = GetComponent<BoxCollider2D>();
 		jumpsAvailable = maxJumps;
 		isFalling = true;
+		dirFacing = 1;
 
-		//load scripts from groundCheck and LeftWallCheck gameobjects
-		groundCheckScript = groundCheck.GetComponent<GroundCheck>();
-		leftWallCheckScript = LeftWallCheck.GetComponent<WallCheck>();
-		rightWallCheckScript = RightWallCheck.GetComponent<WallCheck>();
+		//load scripts from groundCheck and WallCheck gameobjects
+		groundCheckScript = GroundCheck.GetComponent<GroundCheck>();
+		wallCheckScript = WallCheck.GetComponent<WallCheck>();
 
 		ConnectClientToCamera();
 		DisablePhysicsIfOtherPlayer();
@@ -77,23 +77,33 @@ public class Player : NetworkBehaviour {
 			CmdPlayDustParticles();
 			SetHasLanded(false);
 			isFalling = false;
+			isGrounded = true;
 		} 
 	}
 
 	private void detectFalling() {
-		if (!isFalling && GetHasLeftGround() && rb.velocity.y < jumpDecrementThresholdVelocity) {
+		if ((!isFalling && GetHasLeftGround() && rb.velocity.y < jumpDecrementThresholdVelocity) ||
+			(!isFalling && GetHasPushedOffWall() && rb.velocity.y < jumpDecrementThresholdVelocity+wallSlideVelocity)) {
 			isFalling = true;
+			isGrounded = false;
 			SetHasLeftGround(false);
-		}
-		if (!isFalling && GetHasPushedOffWall() && rb.velocity.y < jumpDecrementThresholdVelocity+wallSlideVelocity) {
-			isFalling = true;
-			SetHasPushedOffWall(false);
 		}
 	}
 
 	private void handleMovement() {
 		Vector2 movementVector = new Vector2(Input.GetAxisRaw("Horizontal") * movementSpeed, rb.velocity.y);
 		rb.velocity = movementVector;
+		turnPlayer();
+	}
+
+	private void turnPlayer() {
+		if (Input.GetAxisRaw("Horizontal") == 1f) {
+			dirFacing = 1f;
+		} 
+		else if (Input.GetAxisRaw("Horizontal") == -1f) {
+			dirFacing = -1f;
+		}
+		transform.localScale = new Vector3(dirFacing, 1f, 1f);
 	}
 
 	private void handleJump() {
@@ -107,18 +117,18 @@ public class Player : NetworkBehaviour {
 				jumpsAvailable--;
 				isFalling = false;
 			}
+			isGrounded = false;
 			jumpsAvailable--;
 		}
 	}
 
 	private void handleWallSlide() {
-		// if player is moving left onto a left wall or moving right onto a right wall, wall sliding will activate.
-		if (rb.velocity.y < wallSlideTriggerVelocity) {
-			if ((GetIsTouchingLeftWall() && Input.GetAxisRaw("Horizontal") < 0) ||
-				(GetIsTouchingRightWall() && Input.GetAxisRaw("Horizontal") > 0)) {
+		// if player is moving  onto a  wall or moving right onto a right wall, wall sliding will activate.
+		if (rb.velocity.y < wallSlideTriggerVelocity && !isGrounded) {
+			if (GetIsTouchingWall() && Input.GetAxisRaw("Horizontal") == dirFacing) {
 				CmdPlayDustParticles();
 				isFalling = false;
-				jumpsAvailable = maxJumps;
+				jumpsAvailable = 1;
 				if (rb.velocity.y < wallSlideVelocity) {
 					Vector2 slideVelocity = new Vector2(rb.velocity.x, wallSlideVelocity);
 					rb.velocity = slideVelocity;
@@ -155,25 +165,19 @@ public class Player : NetworkBehaviour {
 		groundCheckScript.SetHasLeftGround(b);
 	}
 
-	private bool GetIsTouchingLeftWall() {
-		return leftWallCheckScript.GetIsTouchingWall();
-	}
-
-	private bool GetIsTouchingRightWall() {
-		return rightWallCheckScript.GetIsTouchingWall();
+	private bool GetIsTouchingWall() {
+		return wallCheckScript.GetIsTouchingWall();
 	}
 
 	private void SetIsTouchingWall(bool b) {
-		leftWallCheckScript.SetIsTouchingWall(b);
-		rightWallCheckScript.SetIsTouchingWall(b);
+		wallCheckScript.SetIsTouchingWall(b);
 	}
 
 	private bool GetHasPushedOffWall() {
-		return leftWallCheckScript.GetHasPushedOffWall() || rightWallCheckScript.GetHasPushedOffWall();
+		return wallCheckScript.GetHasPushedOffWall();
 	}
 
 	private void SetHasPushedOffWall(bool b) {
-		rightWallCheckScript.SetHasPushedOffWall(b);
-		leftWallCheckScript.SetHasPushedOffWall(b);
+		wallCheckScript.SetHasPushedOffWall(b);
 	}
 }

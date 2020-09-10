@@ -4,12 +4,10 @@ using UnityEngine;
 
 public class GroundCheck : MonoBehaviour
 {
-	private BoxCollider2D groundCheckBoxCollider;
 	public bool hasLanded;
 	public bool hasLeftGround;
 	
 	void Start() {
-		groundCheckBoxCollider = GetComponent<BoxCollider2D>();
 		hasLanded = false;
 		hasLeftGround = false;
 	}
