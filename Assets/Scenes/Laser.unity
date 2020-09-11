@@ -434,30 +434,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 5507738772644504521, guid: 4e60ad93c0135c34eac902fd943e8af2, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: -9.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 6127600552136712263, guid: 4e60ad93c0135c34eac902fd943e8af2, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 8.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 6127600552213600577, guid: 4e60ad93c0135c34eac902fd943e8af2, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: -8.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 6127600553144925441, guid: 4e60ad93c0135c34eac902fd943e8af2, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: -8.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 6127600553232491037, guid: 4e60ad93c0135c34eac902fd943e8af2, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 8.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 8808242609522954235, guid: 4e60ad93c0135c34eac902fd943e8af2, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 9.5
-      objectReference: {fileID: 0}
     - target: {fileID: 8808242609661741395, guid: 4e60ad93c0135c34eac902fd943e8af2, type: 3}
       propertyPath: sceneId
       value: 2069847752

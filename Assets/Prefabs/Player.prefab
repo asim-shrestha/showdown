@@ -94,9 +94,11 @@ GameObject:
   - component: {fileID: 5349741901730615648}
   - component: {fileID: 5349741901730615649}
   - component: {fileID: 5349741901730615650}
+  - component: {fileID: 6672537382060020611}
   - component: {fileID: 5349741901730615651}
   - component: {fileID: 6083185996628245252}
   - component: {fileID: 6467107586168053277}
+  - component: {fileID: 963825866451159533}
   m_Layer: 8
   m_Name: Player
   m_TagString: Untagged
@@ -186,6 +188,18 @@ PlatformEffector2D:
   m_UseSideFriction: 0
   m_UseSideBounce: 0
   m_SideArc: 1
+--- !u!114 &6672537382060020611
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5349741901730615679}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 561a2902eb929e749bd6014e01667bb8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &5349741901730615651
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -200,6 +214,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   syncMode: 0
   syncInterval: 0.1
+  isAlive: 1
   movementSpeed: 7
   jumpSpeed: 11
   maxJumps: 2
@@ -239,6 +254,25 @@ MonoBehaviour:
   localPositionSensitivity: 0.01
   localRotationSensitivity: 0.01
   localScaleSensitivity: 0.01
+--- !u!95 &963825866451159533
+Animator:
+  serializedVersion: 3
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5349741901730615679}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: d50be9d562645a548a26ae997ab5a87e, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorControllerStateOnDisable: 0
 --- !u!1001 &5349741900763961740
 PrefabInstance:
   m_ObjectHideFlags: 0

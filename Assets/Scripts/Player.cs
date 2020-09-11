@@ -5,6 +5,7 @@ using Mirror;
 using UnityEngine;
 
 public class Player : NetworkBehaviour {
+	[SerializeField] bool isAlive = true;
 	[SerializeField] float movementSpeed = 7f;
 	[SerializeField] float jumpSpeed = 7f;
 	[SerializeField] int maxJumps = 2;
@@ -14,11 +15,13 @@ public class Player : NetworkBehaviour {
 
 	private Rigidbody2D rb;
 	private BoxCollider2D boxCollider;
+	private Animator animator;
 
 	// Start is called before the first frame update
 	void Start() {
 		rb = GetComponent<Rigidbody2D>();
 		boxCollider = GetComponent<BoxCollider2D>();
+		animator = GetComponent<Animator>();
 		jumpsAvailable = maxJumps;
 		ConnectClientToCamera();
 		DisablePhysicsIfOtherPlayer();
@@ -42,7 +45,7 @@ public class Player : NetworkBehaviour {
 
 	// Update is called once per frame
 	void Update() {
-		if (hasAuthority) {
+		if (hasAuthority && isAlive) {
 			handleResetJumpsAvailable();
 			handleJump();
 			handleMovement();
@@ -100,5 +103,15 @@ public class Player : NetworkBehaviour {
 	[ClientRpc]
 	private void ClientPlayDustParticles() {
 		dustParticles.GetComponent<ParticleSystem>().Play();
+	}
+
+	// Burn animation will call killPlayer after it has finished
+	public void Burn() {
+		GetComponent<Dissolve>().DissolveObject();
+		KillPlayer();
+	}
+
+	private void KillPlayer() {
+		isAlive = false;
 	}
 }

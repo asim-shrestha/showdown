@@ -19,6 +19,12 @@ public class Laser : NetworkBehaviour {
 		DisableLaser();
 	}
 
+	private void OnTriggerEnter2D(Collider2D other) {
+		if (other.gameObject.layer == LayerMask.NameToLayer("Player")) {
+			other.GetComponent<Player>().Burn();
+		}
+	}
+
 	// Called via animation. After the laser has been disabled, the opening animation will again play
 	public void EnableLaser() {
 		numRuns++;
