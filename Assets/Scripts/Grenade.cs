@@ -54,11 +54,11 @@ public class Grenade : MonoBehaviour
 			Destroy(gameObject);
 		}
 
-		changeBlinkInterval(5f, 0.6f);
+		changeBlinkInterval(5f, 0.7f);
 		changeBlinkInterval(2f, 0.15f);
 		
 		if (timeLeftToExplode % blinkInterval > -EPSILON && timeLeftToExplode % blinkInterval < EPSILON) {
-			StartCoroutine(blink());
+			StartCoroutine(Blink());
 		}
 	}
 
@@ -68,7 +68,7 @@ public class Grenade : MonoBehaviour
 		}
 	}
 
-	IEnumerator blink() {
+	IEnumerator Blink() {
 		sr.color = warningColor;
 		yield return new WaitForSeconds(blinkDuration);
 		sr.color = grenadeColor;
