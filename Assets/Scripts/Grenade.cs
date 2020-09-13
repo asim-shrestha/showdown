@@ -1,8 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
+using Mirror;
 using UnityEngine;
 
-public class Grenade : MonoBehaviour
+public class Grenade : NetworkBehaviour
 {
 	[SerializeField] float timeToExplode;
 	[SerializeField] float blinkDuration;
@@ -75,6 +76,19 @@ public class Grenade : MonoBehaviour
 	}
 
 	void OnCollisionEnter2D(Collision2D other) {
+		if (hasAuthority) {
+			CmdAddForceToGrenade();
+		}
+		
+	}
+
+	[Command]
+	private void CmdAddForceToGrenade() {
+		ClientAddForceToGrenade();
+	}
+
+	[ClientRpc]
+	private void ClientAddForceToGrenade() {
 		Vector2 direction = new Vector2(Random.Range(-3f,3f), Random.Range(0f,1f));
 		rb.AddForce(direction * currentThrust, ForceMode2D.Impulse);
 	}

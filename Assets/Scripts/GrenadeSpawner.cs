@@ -1,8 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
+using Mirror;
 using UnityEngine;
 
-public class GrenadeSpawner : MonoBehaviour
+public class GrenadeSpawner : NetworkBehaviour
 {
 	[SerializeField] GameObject grenade;
 	[SerializeField] float spawnInterval;
@@ -21,11 +22,21 @@ public class GrenadeSpawner : MonoBehaviour
 	void Update() {
 		spawnTimeLeft -= Time.deltaTime;
 		// when time left expires, spawn grenade from top of the map at random x location.
-		if (spawnTimeLeft <= 0) {
-			float spawnX = Random.Range(spawnMinimumX, spawnMaximumX);
-			Vector2 spawnPosition = new Vector2(spawnX, spawnY);
-			Instantiate(grenade, spawnPosition, Quaternion.identity);
-			spawnTimeLeft = spawnInterval;
+		if (hasAuthority && spawnTimeLeft <= 0) {
+			CmdMakeGrenades();
 		}
+	}
+
+	[Command]
+	private void CmdMakeGrenades() {
+		ClientMakeGrenades();
+	}
+
+	[ClientRpc]
+	private void ClientMakeGrenades() {
+		float spawnX = Random.Range(spawnMinimumX, spawnMaximumX);
+		Vector2 spawnPosition = new Vector2(spawnX, spawnY);
+		Instantiate(grenade, spawnPosition, Quaternion.identity);
+		spawnTimeLeft = spawnInterval;
 	}
 }
