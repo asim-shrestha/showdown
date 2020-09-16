@@ -9,6 +9,7 @@ public class Kick : MonoBehaviour
 	[SerializeField] Vector2 kickAngle;
 	[SerializeField] float kickStrengh;
 	private float dirFacing;
+	private float EPSILON = 0.1;
 	private Player player;
 	private Rigidbody2D playerRigidbody;
 
@@ -22,10 +23,24 @@ public class Kick : MonoBehaviour
 	void OnTriggerEnter2D(Collider2D other) {
 		if (other.gameObject.tag == "Grenade") {
 			dirFacing = player.dirFacing;
-			float x = kickAngle.x * dirFacing + playerRigidbody.velocity.x;
-			Vector2 kickDirection = new Vector2(x, kickAngle.y + playerRigidbody.velocity.y);
-			Debug.Log(kickDirection);
+			
+			float addVeloctyX = CalculateAdditionalVelocities(playerRigidbody.velocity.x);
+			float addVeloctyY = CalculateAdditionalVelocities(playerRigidbody.velocity.y);
+
+			float x = kickAngle.x * dirFacing + addVeloctyX;
+			float y = kickAngle.y + addVeloctyY;
+			Vector2 kickDirection = new Vector2(x, y);
 			other.gameObject.GetComponent<Rigidbody2D>().AddForce(kickDirection * kickStrengh, ForceMode2D.Impulse);
+		}
+	}
+
+	private float CalculateAdditionalVelocities(float directionalVeloctiy) {
+		float addVelocty = 0;
+		if (directionalVeloctiy > EPSILON) {
+			float addVelocty = 1;
+		} 
+		else if (directionalVeloctiy < -EPSILON) {
+			float addVelocty = -1;
 		}
 	}
 }

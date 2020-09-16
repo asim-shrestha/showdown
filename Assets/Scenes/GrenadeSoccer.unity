@@ -196,11 +196,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8403614424427698383, guid: 8de1fb6c4d3e644478ed45d84c3540bc, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 1.5970907
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8403614424427698383, guid: 8de1fb6c4d3e644478ed45d84c3540bc, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.004772663
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8de1fb6c4d3e644478ed45d84c3540bc, type: 3}
@@ -221,7 +221,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &559142774
 Transform:
   m_ObjectHideFlags: 0
@@ -280,9 +280,17 @@ PrefabInstance:
       value: Network Manager
       objectReference: {fileID: 0}
     - target: {fileID: 1954770384262076808, guid: b5f6fcf22f13065499bc76b76601e55d, type: 3}
+      propertyPath: spawnPrefabs.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1954770384262076808, guid: b5f6fcf22f13065499bc76b76601e55d, type: 3}
       propertyPath: onlineScene
       value: Assets/Scenes/GrenadeSoccer.unity
       objectReference: {fileID: 0}
+    - target: {fileID: 1954770384262076808, guid: b5f6fcf22f13065499bc76b76601e55d, type: 3}
+      propertyPath: spawnPrefabs.Array.data[0]
+      value: 
+      objectReference: {fileID: 4093756858599987161, guid: cf7b7799f7698c962a2d0b581394037c, type: 3}
     - target: {fileID: 1954770384262076809, guid: b5f6fcf22f13065499bc76b76601e55d, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -329,6 +337,43 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b5f6fcf22f13065499bc76b76601e55d, type: 3}
+--- !u!1 &756094665 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1954770384262076805, guid: b5f6fcf22f13065499bc76b76601e55d, type: 3}
+  m_PrefabInstance: {fileID: 756094664}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &756094666
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 756094665}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 64f7f78d2bdf7b4ac9c68b708d067afd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
+  grenade: {fileID: 4093756858599987161, guid: cf7b7799f7698c962a2d0b581394037c, type: 3}
+  spawnInterval: 12
+--- !u!114 &756094667
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 756094665}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b91ecbcc199f4492b9a91e820070131, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sceneId: 3241105761
+  serverOnly: 0
+  m_AssetId: b5f6fcf22f13065499bc76b76601e55d
+  hasSpawned: 0
 --- !u!1 &957702213 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 5967766071218179127, guid: 1b137550891e9764ebaafd9ed35a4300, type: 3}
