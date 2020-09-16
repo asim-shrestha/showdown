@@ -23,26 +23,16 @@ public class GrenadeSpawner : NetworkBehaviour
 		spawnTimeLeft -= Time.deltaTime;
 		// when time left expires, spawn grenade from top of the map at random x location.
 		if (spawnTimeLeft <= 0) {
-			Debug.Log("grenade should have spawned now!");
 			float spawnX = Random.Range(spawnMinimumX, spawnMaximumX);
-			// CmdSpawnGrenades(spawnX, spawnY);
-			Vector2 spawnPosition = new Vector2(spawnX, spawnY);
-			GameObject grenadeInstance = Instantiate(grenade, spawnPosition, Quaternion.identity);
-			NetworkServer.Spawn(grenadeInstance);
+			CmdSpawnGrenades(spawnX, spawnY);
 			spawnTimeLeft = spawnInterval;
 		}
 	}
+
+	[Command]
+	private void CmdSpawnGrenades(float spawnX, float spawnY) {
+		Vector2 spawnPosition = new Vector2(spawnX, spawnY);
+		GameObject grenadeInstance = Instantiate(grenade, spawnPosition, Quaternion.identity);
+		NetworkServer.Spawn(grenadeInstance); // spawns grenade for every player in the network
+	}
 }
-
-// 	[Command(ignoreAuthority = true)]
-// 	private void CmdSpawnGrenades(float spawnX, float spawnY) {
-// 		RpcSpawnGrenades(spawnX, spawnY);
-// 	}
-
-// 	[ClientRpc]
-// 	private void RpcSpawnGrenades(float spawnX, float spawnY) {
-// 		Vector2 spawnPosition = new Vector2(spawnX, spawnY);
-// 		Instantiate(grenade, spawnPosition, Quaternion.identity);
-// 		spawnTimeLeft = spawnInterval;
-// 	}
-// }

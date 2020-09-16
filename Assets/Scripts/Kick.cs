@@ -9,10 +9,9 @@ public class Kick : MonoBehaviour
 	[SerializeField] Vector2 kickAngle;
 	[SerializeField] float kickStrengh;
 	private float dirFacing;
-	private float EPSILON = 0.1;
+	private float EPSILON = 0.1f;
 	private Player player;
 	private Rigidbody2D playerRigidbody;
-
 
 	void Start() {
 		kickBoxCollider = GetComponent<BoxCollider2D>();
@@ -24,23 +23,24 @@ public class Kick : MonoBehaviour
 		if (other.gameObject.tag == "Grenade") {
 			dirFacing = player.dirFacing;
 			
-			float addVeloctyX = CalculateAdditionalVelocities(playerRigidbody.velocity.x);
-			float addVeloctyY = CalculateAdditionalVelocities(playerRigidbody.velocity.y);
+			float addVelocityX = CalculateAdditionalVelocities(playerRigidbody.velocity.x);
+			float addVelocityY = CalculateAdditionalVelocities(playerRigidbody.velocity.y);
 
-			float x = kickAngle.x * dirFacing + addVeloctyX;
-			float y = kickAngle.y + addVeloctyY;
+			float x = kickAngle.x * dirFacing + addVelocityX;
+			float y = kickAngle.y + addVelocityY;
 			Vector2 kickDirection = new Vector2(x, y);
 			other.gameObject.GetComponent<Rigidbody2D>().AddForce(kickDirection * kickStrengh, ForceMode2D.Impulse);
 		}
 	}
 
 	private float CalculateAdditionalVelocities(float directionalVeloctiy) {
-		float addVelocty = 0;
+		float addVelocity = 0f;
 		if (directionalVeloctiy > EPSILON) {
-			float addVelocty = 1;
+			addVelocity = 0.5f;
 		} 
 		else if (directionalVeloctiy < -EPSILON) {
-			float addVelocty = -1;
+			addVelocity = -0.5f;
 		}
+		return addVelocity;
 	}
 }

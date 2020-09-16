@@ -143,7 +143,6 @@ public class Player : NetworkBehaviour {
 
 	private void handleClick() {
 		if (Input.GetMouseButtonDown(0) && !kickIsActive) {
-			Debug.Log("Pressed primary button.");
 			kickIsActive = true;
 			Kick.SetActive(true);
 			StartCoroutine(KickReset());
