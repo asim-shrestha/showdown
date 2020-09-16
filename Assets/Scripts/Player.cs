@@ -84,9 +84,12 @@ public class Player : NetworkBehaviour {
 	private void detectFalling() {
 		if ((!isFalling && GetHasLeftGround() && rb.velocity.y < jumpDecrementThresholdVelocity) ||
 			(!isFalling && GetHasPushedOffWall() && rb.velocity.y < jumpDecrementThresholdVelocity+wallSlideVelocity)) {
+			Debug.Log("falling detected. isFalling = false");
 			isFalling = true;
+			Debug.Log("set isFalling to true");
 			isGrounded = false;
 			SetHasLeftGround(false);
+			SetHasPushedOffWall(false);
 		}
 	}
 
@@ -113,11 +116,14 @@ public class Player : NetworkBehaviour {
 		if (Input.GetButtonDown("Jump")) {
 			Vector2 jumpVelocity = new Vector2(rb.velocity.x, jumpSpeed);
 			rb.velocity = jumpVelocity;
+			isGrounded = false;
 			if (isFalling) {
 				jumpsAvailable--;
 				isFalling = false;
+				if (jumpsAvailable <= 0) {
+					return;
+				}
 			}
-			isGrounded = false;
 			jumpsAvailable--;
 		}
 	}
