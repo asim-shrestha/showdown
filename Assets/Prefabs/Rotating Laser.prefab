@@ -19261,11 +19261,11 @@ GameObject:
   - component: {fileID: 3401543457821477115}
   - component: {fileID: 3401543457821477113}
   - component: {fileID: 3401543457821477112}
-  - component: {fileID: 3401543457821477110}
   - component: {fileID: 3401543457821477109}
   - component: {fileID: 3401543457821477111}
   - component: {fileID: 1590691866}
   - component: {fileID: 1590691861}
+  - component: {fileID: 6112123707727547561}
   m_Layer: 0
   m_Name: Rotating Laser
   m_TagString: Untagged
@@ -19337,29 +19337,6 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
---- !u!114 &3401543457821477110
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3401543457821477114}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 329128e343b3af346808380f6ae36daf, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  syncMode: 0
-  syncInterval: 0.1
-  LaserParticles:
-  - {fileID: 724640701}
-  - {fileID: 1816224227}
-  - {fileID: 1475614953}
-  - {fileID: 543784101}
-  secondsTillDisable: 3
-  numRuns: 0
-  direction: 1
-  directionFlipPercent: 0
 --- !u!114 &3401543457821477109
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -19423,8 +19400,37 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5421dba47f75c7645b90e2dcbed7a32d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
+  LaserParticles:
+  - {fileID: 724640701}
+  - {fileID: 1816224227}
+  - {fileID: 1475614953}
+  - {fileID: 543784101}
+  numRuns: 0
+  direction: 1
+  directionFlipPercent: 5
+  secondsTillDisable: 3
   initialRotationSpeed: 0.4
   rotationMultiplier: 0.05
+--- !u!114 &6112123707727547561
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3401543457821477114}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2f74aedd71d9a4f55b3ce499326d45fb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
+  clientAuthority: 0
+  localPositionSensitivity: 0.01
+  localRotationSensitivity: 0.01
+  localScaleSensitivity: 0.01
 --- !u!1 &3401543457855322157
 GameObject:
   m_ObjectHideFlags: 0

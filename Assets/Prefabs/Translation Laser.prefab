@@ -19342,6 +19342,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8808242609522954235}
   - component: {fileID: 8808242609522954236}
+  - component: {fileID: 1445055000309813043}
   m_Layer: 0
   m_Name: Top
   m_TagString: Untagged
@@ -19414,6 +19415,22 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &1445055000309813043
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8808242609522954234}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b91ecbcc199f4492b9a91e820070131, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sceneId: 0
+  serverOnly: 0
+  m_AssetId: 
+  hasSpawned: 0
 --- !u!1 &8808242609628445067
 GameObject:
   m_ObjectHideFlags: 0
@@ -19554,13 +19571,13 @@ GameObject:
   - component: {fileID: 8808242609661741405}
   - component: {fileID: 8808242609661741407}
   - component: {fileID: 8808242609661741406}
-  - component: {fileID: 8808242609661741392}
   - component: {fileID: 8808242609661741395}
   - component: {fileID: 8808242609661741393}
   - component: {fileID: 6127600552362232252}
   - component: {fileID: 8788222882873784828}
   - component: {fileID: 1397341910}
   - component: {fileID: 1397341911}
+  - component: {fileID: 7371540871918367530}
   m_Layer: 0
   m_Name: Translation Laser
   m_TagString: Untagged
@@ -19610,7 +19627,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 0.5, y: 40}
+  m_Size: {x: 0.5, y: 20}
   m_EdgeRadius: 0
 --- !u!50 &8808242609661741406
 Rigidbody2D:
@@ -19633,29 +19650,6 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
---- !u!114 &8808242609661741392
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8808242609661741404}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 329128e343b3af346808380f6ae36daf, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  syncMode: 0
-  syncInterval: 0.1
-  LaserParticles:
-  - {fileID: 6127600553232491035}
-  - {fileID: 6127600552136712261}
-  - {fileID: 6127600552213600591}
-  - {fileID: 6127600553144925443}
-  secondsTillDisable: 2
-  numRuns: 0
-  direction: 1
-  directionFlipPercent: 20
 --- !u!114 &8808242609661741395
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -19719,6 +19713,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 72f491523130ed24f8fbf6631c314f34, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
+  LaserParticles:
+  - {fileID: 6127600553232491035}
+  - {fileID: 6127600552136712261}
+  - {fileID: 6127600552213600591}
+  - {fileID: 6127600553144925443}
+  numRuns: 0
+  direction: 1
+  directionFlipPercent: 10
+  secondsTillDisable: 3
   initialTranslationSpeed: 0.01
   translationMultiplier: 0.001
   endPoints: {fileID: 0}
@@ -19754,3 +19759,21 @@ CircleCollider2D:
   m_Offset: {x: 0, y: 8.5}
   serializedVersion: 2
   m_Radius: 0.5
+--- !u!114 &7371540871918367530
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8808242609661741404}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2f74aedd71d9a4f55b3ce499326d45fb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
+  clientAuthority: 0
+  localPositionSensitivity: 0.01
+  localRotationSensitivity: 0.01
+  localScaleSensitivity: 0.01

@@ -5,10 +5,10 @@ using UnityEngine;
 
 public class Laser : NetworkBehaviour {
 	[SerializeField] ParticleSystem[] LaserParticles;
-	[SerializeField] float secondsTillDisable = 5;
-	[SerializeField] int numRuns = 0;
-	[SerializeField] int direction = 1;
+	[SerializeField] protected int numRuns = 0;
+	[SerializeField] protected int direction = 1;
 	[SerializeField][Range(0, 100)] int directionFlipPercent = 20; // Percent chance to change direction on disable
+	[SerializeField] float secondsTillDisable = 5;
 
 	private BoxCollider2D boxCollider;
 	private Animator animator;
@@ -59,20 +59,13 @@ public class Laser : NetworkBehaviour {
 		}
 	}
 
-	public int GetNumRuns() {
-		return numRuns;
-	}
-
-	public int GetDirection() {
-		return direction;
-	}
-
 	public void RandomlyFlipDirection() {
 		if (directionFlipPercent >= Random.Range(0, 100)) {
 			direction *= -1;
 		}
 	}
 
+	// Laser bounds may flip the laser direction
 	public void SetDirection(int direction) {
 		this.direction = direction;
 	}

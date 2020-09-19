@@ -1,20 +1,19 @@
 using System.Collections;
 using System.Collections.Generic;
+using Mirror;
 using UnityEngine;
 
-public class RotationLaser : MonoBehaviour {
+public class RotationLaser : Laser {
 	[SerializeField] float initialRotationSpeed = 0.4f;
 	[SerializeField] float rotationMultiplier = 0.05f;
 
-	private Laser laser;
-
-	private void Start() {
-		laser = GetComponent<Laser>();
+	void FixedUpdate() {
+		RotateLaser();
 	}
 
-	void FixedUpdate() {
+	private void RotateLaser() {
 		transform.Rotate(
-			new Vector3(0, 0, initialRotationSpeed + laser.GetNumRuns() * rotationMultiplier) * laser.GetDirection()
+			new Vector3(0, 0, initialRotationSpeed + numRuns * rotationMultiplier) * direction
 		);
 	}
 }
