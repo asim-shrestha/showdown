@@ -77,19 +77,34 @@ public class Grenade : NetworkBehaviour
 
 	void OnCollisionEnter2D(Collision2D other) {
 		if (hasAuthority) {
-			CmdAddForceToGrenade();
+			CmdAddRandomForce();
 		}
-		
 	}
 
-	[Command]
-	private void CmdAddForceToGrenade() {
-		ClientAddForceToGrenade();
+	[Command] 
+	private void CmdAddRandomForce() {
+		ClientAddRandomForce();
 	}
 
 	[ClientRpc]
-	private void ClientAddForceToGrenade() {
+	private void ClientAddRandomForce() {
 		Vector2 direction = new Vector2(Random.Range(-3f,3f), Random.Range(0f,1f));
 		rb.AddForce(direction * currentThrust, ForceMode2D.Impulse);
 	}
+
+	public void AddKickForce(Vector2 kickVector) {
+		CmdAddKickForce(kickVector);
+	}
+
+	[Command(ignoreAuthority=true)]
+	private void CmdAddKickForce(Vector2 kickVector) {
+		ClientAddKickForce(kickVector);
+	}
+
+	[ClientRpc]
+	private void ClientAddKickForce(Vector2 kickVector) {
+		rb.AddForce(kickVector, ForceMode2D.Impulse);
+	}
+
 }
+

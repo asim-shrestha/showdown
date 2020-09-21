@@ -139,10 +139,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: Network Manager
       objectReference: {fileID: 0}
-    - target: {fileID: 1954770384262076808, guid: b5f6fcf22f13065499bc76b76601e55d, type: 3}
-      propertyPath: onlineScene
-      value: Assets/Scenes/SampleScene.unity
-      objectReference: {fileID: 0}
     - target: {fileID: 1954770384262076809, guid: b5f6fcf22f13065499bc76b76601e55d, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -2524,14 +2520,6 @@ PrefabInstance:
     - target: {fileID: 8403614424160407802, guid: 8de1fb6c4d3e644478ed45d84c3540bc, type: 3}
       propertyPath: m_ChildCameras.Array.size
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8403614424427698383, guid: 8de1fb6c4d3e644478ed45d84c3540bc, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0.24486351
-      objectReference: {fileID: 0}
-    - target: {fileID: 8403614424427698383, guid: 8de1fb6c4d3e644478ed45d84c3540bc, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0.00073194504
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8de1fb6c4d3e644478ed45d84c3540bc, type: 3}

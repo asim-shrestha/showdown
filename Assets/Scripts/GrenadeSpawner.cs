@@ -24,12 +24,14 @@ public class GrenadeSpawner : NetworkBehaviour
 		// when time left expires, spawn grenade from top of the map at random x location.
 		if (spawnTimeLeft <= 0) {
 			float spawnX = Random.Range(spawnMinimumX, spawnMaximumX);
-			CmdSpawnGrenades(spawnX, spawnY);
+			if (isServer) {
+				CmdSpawnGrenades(spawnX, spawnY);
+			}
 			spawnTimeLeft = spawnInterval;
 		}
 	}
 
-	[Command]
+	[Command(ignoreAuthority = true)]
 	private void CmdSpawnGrenades(float spawnX, float spawnY) {
 		Vector2 spawnPosition = new Vector2(spawnX, spawnY);
 		GameObject grenadeInstance = Instantiate(grenade, spawnPosition, Quaternion.identity);

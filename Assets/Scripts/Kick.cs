@@ -7,7 +7,7 @@ public class Kick : MonoBehaviour
 {
 	private BoxCollider2D kickBoxCollider;
 	[SerializeField] Vector2 kickAngle;
-	[SerializeField] float kickStrengh;
+	[SerializeField] float kickStrength;
 	private float dirFacing;
 	private float EPSILON = 0.1f;
 	private Player player;
@@ -29,7 +29,8 @@ public class Kick : MonoBehaviour
 			float x = kickAngle.x * dirFacing + addVelocityX;
 			float y = kickAngle.y + addVelocityY;
 			Vector2 kickDirection = new Vector2(x, y);
-			other.gameObject.GetComponent<Rigidbody2D>().AddForce(kickDirection * kickStrengh, ForceMode2D.Impulse);
+			// other.gameObject.GetComponent<Rigidbody2D>().AddForce(kickDirection * kickStrengh, ForceMode2D.Impulse);
+			other.gameObject.GetComponent<Grenade>().AddKickForce(kickDirection * kickStrength);
 		}
 	}
 
