@@ -170,7 +170,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0c90c686ce406d64e8d4c745d3a8e808, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  timeToExplode: 6
+  syncMode: 0
+  syncInterval: 0.1
+  timeToExplode: 7
   blinkDuration: 0.05
   randomBounceThrust: 1
   randomBounceStopSpeedThreshold: 3
