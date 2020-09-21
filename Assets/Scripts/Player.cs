@@ -17,7 +17,8 @@ public class Player : NetworkBehaviour {
 	float dirFacing;
 
 	// GameObject instead of particle system to pass into a server command
-	[SerializeField] private GameObject dustParticles;
+	[SerializeField] private GameObject groundDustParticles;
+	[SerializeField] private GameObject wallDustParticles;
 	
 	// Ground and wall checks are performed with the following gameobjects.
 	[SerializeField] private GameObject GroundCheck;
@@ -74,7 +75,7 @@ public class Player : NetworkBehaviour {
 	private void detectLanding() {
 		if (GetHasLanded()) {
 			jumpsAvailable = maxJumps;
-			CmdPlayDustParticles();
+			CmdPlayGroundDustParticles();
 			SetHasLanded(false);
 			isFalling = false;
 			isGrounded = true;
@@ -87,6 +88,7 @@ public class Player : NetworkBehaviour {
 			isFalling = true;
 			isGrounded = false;
 			SetHasLeftGround(false);
+			SetHasPushedOffWall(false);
 		}
 	}
 
@@ -113,11 +115,14 @@ public class Player : NetworkBehaviour {
 		if (Input.GetButtonDown("Jump")) {
 			Vector2 jumpVelocity = new Vector2(rb.velocity.x, jumpSpeed);
 			rb.velocity = jumpVelocity;
+			isGrounded = false;
 			if (isFalling) {
 				jumpsAvailable--;
 				isFalling = false;
+				if (jumpsAvailable <= 0) {
+					return;
+				}
 			}
-			isGrounded = false;
 			jumpsAvailable--;
 		}
 	}
@@ -126,7 +131,7 @@ public class Player : NetworkBehaviour {
 		// if player is moving  onto a  wall or moving right onto a right wall, wall sliding will activate.
 		if (rb.velocity.y < wallSlideTriggerVelocity && !isGrounded) {
 			if (GetIsTouchingWall() && Input.GetAxisRaw("Horizontal") == dirFacing) {
-				CmdPlayDustParticles();
+				CmdPlayWallDustParticles();
 				isFalling = false;
 				jumpsAvailable = 1;
 				if (rb.velocity.y < wallSlideVelocity) {
@@ -139,13 +144,23 @@ public class Player : NetworkBehaviour {
 
 	// Run on server so every player can see the dust particles
 	[Command]
-	private void CmdPlayDustParticles() {
-		ClientPlayDustParticles();
+	private void CmdPlayGroundDustParticles() {
+		ClientPlayGroundDustParticles();
 	}
 
 	[ClientRpc]
-	private void ClientPlayDustParticles() {
-		dustParticles.GetComponent<ParticleSystem>().Play();
+	private void ClientPlayGroundDustParticles() {
+		groundDustParticles.GetComponent<ParticleSystem>().Play();
+	}
+
+	[Command]
+	private void CmdPlayWallDustParticles() {
+		ClientPlayWallDustParticles();
+	}
+
+	[ClientRpc]
+	private void ClientPlayWallDustParticles() {
+		wallDustParticles.GetComponent<ParticleSystem>().Play();
 	}
 
 	// checks if the small groundcheck collision box below player is triggered.
