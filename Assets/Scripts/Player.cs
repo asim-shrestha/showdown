@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using Cinemachine;
 using Mirror;
@@ -7,11 +7,24 @@ using UnityEngine;
 public class Player : NetworkBehaviour {
 	[SerializeField] bool isAlive = true;
 	[SerializeField] float movementSpeed = 7f;
-	[SerializeField] float jumpSpeed = 7f;
+	[SerializeField] float jumpSpeed = 13f;
 	[SerializeField] int maxJumps = 2;
 	[SerializeField] int jumpsAvailable;
+	[SerializeField] float jumpDecrementThresholdVelocity = -0.05f; //when falling off a cliff, gives a buffer time before jump count will decrement
+	[SerializeField] float wallSlideTriggerVelocity = 0.1f; //upward direction
+	[SerializeField] float wallSlideVelocity = -0.1f; //downward direction
+	bool isFalling;
+	bool isGrounded;
+	float dirFacing;
+
 	// GameObject instead of particle system to pass into a server command
 	[SerializeField] private GameObject dustParticles;
+	
+	// Ground and wall checks are performed with the following gameobjects.
+	[SerializeField] private GameObject GroundCheck;
+	private GroundCheck groundCheckScript;
+	[SerializeField] private GameObject WallCheck;
+	private WallCheck wallCheckScript;
 
 	private Rigidbody2D rb;
 	private BoxCollider2D boxCollider;
@@ -23,6 +36,13 @@ public class Player : NetworkBehaviour {
 		boxCollider = GetComponent<BoxCollider2D>();
 		animator = GetComponent<Animator>();
 		jumpsAvailable = maxJumps;
+		isFalling = true;
+		dirFacing = 1;
+
+		//load scripts from groundCheck and WallCheck gameobjects
+		groundCheckScript = GroundCheck.GetComponent<GroundCheck>();
+		wallCheckScript = WallCheck.GetComponent<WallCheck>();
+
 		ConnectClientToCamera();
 		DisablePhysicsIfOtherPlayer();
 	}
@@ -45,51 +65,77 @@ public class Player : NetworkBehaviour {
 	// Update is called once per frame
 	void Update() {
 		if (hasAuthority && isAlive) {
-			HandleResetJumpsAvailable();
+			detectLanding();
+			detectFalling();
 			handleJump();
+			handleWallSlide();
 			handleMovement();
 		}
 	}
 
-	private void HandleResetJumpsAvailable() {
-		if (isGrounded()) {
+	private void detectLanding() {
+		if (GetHasLanded()) {
 			jumpsAvailable = maxJumps;
-		}
+			CmdPlayDustParticles();
+			SetHasLanded(false);
+			isFalling = false;
+			isGrounded = true;
+		} 
 	}
 
-	// Draws a ray from the origin of the player downwards
-	// Returns whether or not the ray hits the ground and the player is not moving upward
-	private bool isGrounded() {
-		// TODO remove debug
-		float extraHeight = 0.1f; // Used so that the boxcast slightly extends past the plaer
-		Debug.DrawRay(boxCollider.bounds.center, boxCollider.bounds.size / 2 * Vector2.down, Color.black);
-		RaycastHit2D raycast = Physics2D.BoxCast(
-			boxCollider.bounds.center,
-			boxCollider.bounds.size,
-			0f,
-			Vector2.down,
-			extraHeight,
-			LayerMask.GetMask("Ground")
-		);
-		float velocityEpsilon = 0.01f;
-		return raycast.collider != null && Mathf.Abs(rb.velocity.y) <= velocityEpsilon;
+	private void detectFalling() {
+		if ((!isFalling && GetHasLeftGround() && rb.velocity.y < jumpDecrementThresholdVelocity) ||
+			(!isFalling && GetHasPushedOffWall() && rb.velocity.y < jumpDecrementThresholdVelocity+wallSlideVelocity)) {
+			isFalling = true;
+			isGrounded = false;
+			SetHasLeftGround(false);
+		}
 	}
 
 	private void handleMovement() {
 		Vector2 movementVector = new Vector2(Input.GetAxisRaw("Horizontal") * movementSpeed, rb.velocity.y);
 		rb.velocity = movementVector;
+		turnPlayer();
+	}
+
+	private void turnPlayer() {
+		if (Input.GetAxisRaw("Horizontal") == 1f) {
+			dirFacing = 1f;
+		} 
+		else if (Input.GetAxisRaw("Horizontal") == -1f) {
+			dirFacing = -1f;
+		}
+		transform.localScale = new Vector3(dirFacing, 1f, 1f);
 	}
 
 	private void handleJump() {
 		if (jumpsAvailable <= 0) {
 			return;
-		} else if (Input.GetButtonDown("Jump")) {
+		}
+		if (Input.GetButtonDown("Jump")) {
 			Vector2 jumpVelocity = new Vector2(rb.velocity.x, jumpSpeed);
 			rb.velocity = jumpVelocity;
-			if (jumpsAvailable == maxJumps) {
-				CmdPlayDustParticles();
+			if (isFalling) {
+				jumpsAvailable--;
+				isFalling = false;
 			}
+			isGrounded = false;
 			jumpsAvailable--;
+		}
+	}
+
+	private void handleWallSlide() {
+		// if player is moving  onto a  wall or moving right onto a right wall, wall sliding will activate.
+		if (rb.velocity.y < wallSlideTriggerVelocity && !isGrounded) {
+			if (GetIsTouchingWall() && Input.GetAxisRaw("Horizontal") == dirFacing) {
+				CmdPlayDustParticles();
+				isFalling = false;
+				jumpsAvailable = 1;
+				if (rb.velocity.y < wallSlideVelocity) {
+					Vector2 slideVelocity = new Vector2(rb.velocity.x, wallSlideVelocity);
+					rb.velocity = slideVelocity;
+				}
+			}
 		}
 	}
 
@@ -113,5 +159,37 @@ public class Player : NetworkBehaviour {
 
 	private void KillPlayer() {
 		isAlive = false;
+	}
+	// checks if the small groundcheck collision box below player is triggered.
+	private bool GetHasLanded() {
+		return groundCheckScript.GetHasLanded();
+	}
+	
+	private void SetHasLanded(bool b) {
+		groundCheckScript.SetHasLanded(b);
+	}
+
+	private bool GetHasLeftGround() {
+		return groundCheckScript.GetHasLeftGround();
+	}
+
+	private void SetHasLeftGround(bool b) {
+		groundCheckScript.SetHasLeftGround(b);
+	}
+
+	private bool GetIsTouchingWall() {
+		return wallCheckScript.GetIsTouchingWall();
+	}
+
+	private void SetIsTouchingWall(bool b) {
+		wallCheckScript.SetIsTouchingWall(b);
+	}
+
+	private bool GetHasPushedOffWall() {
+		return wallCheckScript.GetHasPushedOffWall();
+	}
+
+	private void SetHasPushedOffWall(bool b) {
+		wallCheckScript.SetHasPushedOffWall(b);
 	}
 }
