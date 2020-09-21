@@ -8,7 +8,9 @@ public class RotationLaser : Laser {
 	[SerializeField] float rotationMultiplier = 0.05f;
 
 	void FixedUpdate() {
-		RotateLaser();
+		if(isServer) {
+			RotateLaser();
+		}
 	}
 
 	private void RotateLaser() {

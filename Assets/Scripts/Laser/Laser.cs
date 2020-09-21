@@ -20,6 +20,7 @@ public class Laser : NetworkBehaviour {
 	}
 
 	private void OnTriggerEnter2D(Collider2D other) {
+		if(!isServer) { return; }
 		if (other.gameObject.layer == LayerMask.NameToLayer("Player")) {
 			other.GetComponent<Player>().Burn();
 		}
@@ -27,7 +28,6 @@ public class Laser : NetworkBehaviour {
 
 	// Called via animation. After the laser has been disabled, the opening animation will again play
 	public void EnableLaser() {
-		numRuns++;
 		EnableParticles();
 		boxCollider.enabled = true;
 		StartCoroutine(WaitAndDisableLaser());
@@ -59,7 +59,7 @@ public class Laser : NetworkBehaviour {
 		}
 	}
 
-	public void RandomlyFlipDirection() {
+	private void RandomlyFlipDirection() {
 		if (directionFlipPercent >= Random.Range(0, 100)) {
 			direction *= -1;
 		}

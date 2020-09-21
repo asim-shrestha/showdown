@@ -9,7 +9,9 @@ public class TranslationLaser : Laser {
 	[SerializeField] Collider2D endPoints;
 
 	void FixedUpdate() {
-		TranslateLaser();
+		if(isServer) {
+			TranslateLaser();
+		}
 	}
 
 	private void TranslateLaser() {
