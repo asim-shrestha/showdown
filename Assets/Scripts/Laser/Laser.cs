@@ -7,7 +7,6 @@ public class Laser : NetworkBehaviour {
 	[SerializeField] ParticleSystem[] LaserParticles;
 	[SerializeField] protected int numRuns = 0;
 	[SerializeField] protected int direction = 1;
-	[SerializeField][Range(0, 100)] int directionFlipPercent = 20; // Percent chance to change direction on disable
 	[SerializeField] float secondsTillDisable = 5;
 
 	private BoxCollider2D boxCollider;
@@ -44,7 +43,6 @@ public class Laser : NetworkBehaviour {
 	public void DisableLaser() {
 		DisableParticles();
 		boxCollider.enabled = false;
-		RandomlyFlipDirection();
 	}
 
 	private void DisableParticles() {
@@ -56,12 +54,6 @@ public class Laser : NetworkBehaviour {
 	private void EnableParticles() {
 		foreach (ParticleSystem particleSystem in LaserParticles) {
 			particleSystem.Play();
-		}
-	}
-
-	private void RandomlyFlipDirection() {
-		if (directionFlipPercent >= Random.Range(0, 100)) {
-			direction *= -1;
 		}
 	}
 

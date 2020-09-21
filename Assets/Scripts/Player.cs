@@ -30,7 +30,6 @@ public class Player : NetworkBehaviour {
 	private void ConnectClientToCamera() {
 		// Ensure the player belongs to this client
 		if (!hasAuthority) { return; }
-
 		CinemachineStateDrivenCamera camera = FindObjectOfType<CinemachineStateDrivenCamera>();
 		camera.Follow = transform;
 		camera.LookAt = transform;
@@ -46,13 +45,13 @@ public class Player : NetworkBehaviour {
 	// Update is called once per frame
 	void Update() {
 		if (hasAuthority && isAlive) {
-			handleResetJumpsAvailable();
+			HandleResetJumpsAvailable();
 			handleJump();
 			handleMovement();
 		}
 	}
 
-	private void handleResetJumpsAvailable() {
+	private void HandleResetJumpsAvailable() {
 		if (isGrounded()) {
 			jumpsAvailable = maxJumps;
 		}
@@ -106,6 +105,7 @@ public class Player : NetworkBehaviour {
 	}
 
 	// Burn animation will call killPlayer after it has finished
+	[ClientRpc]
 	public void Burn() {
 		GetComponent<Dissolve>().DissolveObject();
 		KillPlayer();
