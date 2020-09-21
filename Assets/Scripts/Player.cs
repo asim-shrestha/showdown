@@ -151,7 +151,6 @@ public class Player : NetworkBehaviour {
 	}
 
 	// Burn animation will call killPlayer after it has finished
-	[ClientRpc]
 	public void Burn() {
 		GetComponent<Dissolve>().DissolveObject();
 		KillPlayer();

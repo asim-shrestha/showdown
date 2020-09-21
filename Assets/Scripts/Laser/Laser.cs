@@ -19,9 +19,10 @@ public class Laser : NetworkBehaviour {
 	}
 
 	private void OnTriggerEnter2D(Collider2D other) {
-		if(!isServer) { return; }
-		if (other.gameObject.layer == LayerMask.NameToLayer("Player")) {
-			other.GetComponent<Player>().Burn();
+		if(isClientOnly) { return; }
+		Player colliderPlayer = other.gameObject.GetComponent<Player>();
+		if (colliderPlayer) {
+			colliderPlayer.Burn();
 		}
 	}
 

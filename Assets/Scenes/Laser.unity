@@ -304,6 +304,10 @@ PrefabInstance:
       propertyPath: m_BoundingShape2D
       value: 
       objectReference: {fileID: 1658094965081658163}
+    - target: {fileID: 8403614424160407802, guid: 8de1fb6c4d3e644478ed45d84c3540bc, type: 3}
+      propertyPath: m_ChildCameras.Array.size
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8de1fb6c4d3e644478ed45d84c3540bc, type: 3}
 --- !u!1001 &273351622149517479

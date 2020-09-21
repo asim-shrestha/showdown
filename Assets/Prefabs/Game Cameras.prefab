@@ -131,7 +131,7 @@ GameObject:
   - component: {fileID: 8403614423077278153}
   - component: {fileID: 8403614423077278152}
   m_Layer: 0
-  m_Name: 'Player idle '
+  m_Name: Player Idle Camera
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
