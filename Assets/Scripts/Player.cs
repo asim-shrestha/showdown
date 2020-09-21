@@ -85,9 +85,7 @@ public class Player : NetworkBehaviour {
 	private void detectFalling() {
 		if ((!isFalling && GetHasLeftGround() && rb.velocity.y < jumpDecrementThresholdVelocity) ||
 			(!isFalling && GetHasPushedOffWall() && rb.velocity.y < jumpDecrementThresholdVelocity+wallSlideVelocity)) {
-			Debug.Log("falling detected. isFalling = false");
 			isFalling = true;
-			Debug.Log("set isFalling to true");
 			isGrounded = false;
 			SetHasLeftGround(false);
 			SetHasPushedOffWall(false);
