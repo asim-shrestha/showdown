@@ -9,7 +9,7 @@ public class GrenadeSpawner : NetworkBehaviour
 	[SerializeField] float spawnInterval;
 	private float spawnTimeLeft;
 	private float spawnMinimumX = -9;
-	private float spawnMaximumX = 27;
+	private float spawnMaximumX = 16;
 	private float spawnY = 7f;
 
 	
