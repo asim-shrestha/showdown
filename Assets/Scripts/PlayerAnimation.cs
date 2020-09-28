@@ -1,9 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Mirror;
 
-public class PlayerAnimation : NetworkBehaviour
+public class PlayerAnimation : MonoBehaviour
 {
 	// GameObject instead of particle system to pass into a server command
 	[SerializeField] private GameObject groundDustParticles;
@@ -21,27 +20,39 @@ public class PlayerAnimation : NetworkBehaviour
 	// Update is called once per frame
 	void Update()
 	{
-		
 	}
 
 	public void HandleLandingAnim() {
-		if (hasAuthority) {
-			CmdPlayGroundDustParticles();
-			animator.Play("PlayerIdle");
-		}
+		animator.Play("PlayerIdle");
+	}
+
+	public void HandleGroundDustAnim() {
+		groundDustParticles.GetComponent<ParticleSystem>().Play();
+	}
+
+	public void HandleFallingAnim() {
+		animator.Play("PlayerFall");
 	}
 
 	public void HandleMovementAnim() {
 		if (Input.GetAxisRaw("Horizontal") != 0) {
-			if (!animator.GetCurrentAnimatorStateInfo(0).IsName("PlayerJump")) {
+			if (!isAnimInAction()) {
 				animator.Play("PlayerWalk");
 			}
 		}
 		else {
-			if (!animator.GetCurrentAnimatorStateInfo(0).IsName("PlayerJump")) {
+			if (!isAnimInAction()) {
 				animator.Play("PlayerIdle");
 			}
 		}
+	}
+
+	private bool isAnimInAction() {
+		return animator.GetCurrentAnimatorStateInfo(0).IsName("PlayerJump") || 
+			animator.GetCurrentAnimatorStateInfo(0).IsName("PlayerWallSlide") ||
+			animator.GetCurrentAnimatorStateInfo(0).IsName("PlayerFall");
+			
+		
 	}
 
 	public void HandleJumpAnim() {
@@ -49,31 +60,9 @@ public class PlayerAnimation : NetworkBehaviour
 	}
 
 	public void HandleWallSlideAnim() {
-		if (hasAuthority) {
-			CmdPlayWallDustParticles();
-		}
-	}
- 
- 
-	[Command]
-	private void CmdPlayGroundDustParticles() {
-		ClientPlayGroundDustParticles();
-	}
-
-	[ClientRpc]
-	private void ClientPlayGroundDustParticles() {
-		groundDustParticles.GetComponent<ParticleSystem>().Play();
-	}
-
-	[Command]
-	private void CmdPlayWallDustParticles() {
-		ClientPlayWallDustParticles();
-	}
-
-	[ClientRpc]
-	private void ClientPlayWallDustParticles() {
 		wallDustParticles.GetComponent<ParticleSystem>().Play();
+		animator.Play("PlayerWallSlide");
 	}
-
+ 
 }
 

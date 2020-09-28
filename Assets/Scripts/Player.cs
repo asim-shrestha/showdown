@@ -16,13 +16,16 @@ public class Player : NetworkBehaviour {
 	bool isGrounded;
 	float dirFacing;
 
+	// [SerializeField] private GameObject groundDustParticles;
+	// [SerializeField] private GameObject wallDustParticles;
 
-	
 	// Ground and wall checks are performed with the following gameobjects.
 	[SerializeField] private GameObject GroundCheck;
 	private GroundCheck groundCheckScript;
 	[SerializeField] private GameObject WallCheck;
 	private WallCheck wallCheckScript;
+
+
 	[SerializeField] private GameObject Animation;
 	private PlayerAnimation animationScript;
 
@@ -76,13 +79,15 @@ public class Player : NetworkBehaviour {
 	}
 
 	private void detectLanding() {
-		if (GetHasLanded()) {
+		if (GetIsTouchingGround()) {
+			if (!isGrounded) {
+				CmdHandleGroundDustAnim();
+				CmdHandleLandingAnim();
+			}
 			jumpsAvailable = maxJumps;
-			// CmdPlayGroundDustParticles();
-			SetHasLanded(false);
 			isFalling = false;
 			isGrounded = true;
-			// animator.Play("PlayerIdle");
+			
 		} 
 	}
 
@@ -94,13 +99,21 @@ public class Player : NetworkBehaviour {
 			SetHasLeftGround(false);
 			SetHasPushedOffWall(false);
 		}
+		if (isFalling) {
+			CmdHandleFallingAnim();
+		}
 	}
 
 	private void handleMovement() {
-		Vector2 movementVector = new Vector2(Input.GetAxisRaw("Horizontal") * movementSpeed, rb.velocity.y);
-		rb.velocity = movementVector;
-		turnPlayer();
-		animationScript.HandleMovementAnim();
+		if (Input.GetAxisRaw("Horizontal") != 0) {
+			Vector2 movementVector = new Vector2(Input.GetAxisRaw("Horizontal") * movementSpeed, rb.velocity.y);
+			rb.velocity = movementVector;
+			turnPlayer();
+		}
+		else {
+			rb.velocity = new Vector2(0, rb.velocity.y);
+		}
+		CmdHandleMovementAnim();
 	}
 
 	private void turnPlayer() {
@@ -124,8 +137,8 @@ public class Player : NetworkBehaviour {
 				}
 			}
 			jumpsAvailable--;
+			CmdHandleJumpAnim();
 			// animator.Play("PlayerJump");
-			animationScript.HandleJumpAnim();
 		}
 	}
 
@@ -133,7 +146,8 @@ public class Player : NetworkBehaviour {
 		// if player is moving  onto a  wall or moving right onto a right wall, wall sliding will activate.
 		if (rb.velocity.y < wallSlideTriggerVelocity && !isGrounded) {
 			if (GetIsTouchingWall() && Input.GetAxisRaw("Horizontal") == dirFacing) {
-				animationScript.HandleWallSlideAnim();
+				// CmdPlayWallDustParticles();
+				CmdHandleWallSlideAnim();
 				isFalling = false;
 				jumpsAvailable = 1;
 				if (rb.velocity.y < wallSlideVelocity) {
@@ -144,35 +158,85 @@ public class Player : NetworkBehaviour {
 		}
 	}
 
-	// Run on server so every player can see the dust particles
-	// [Command]
-	// private void CmdPlayGroundDustParticles() {
-	// 	ClientPlayGroundDustParticles();
-	// }
+	[Command]
+	private void CmdHandleLandingAnim() {
+		ClientHandleLandingAnim();
+	}
 
-	// [ClientRpc]
-	// private void ClientPlayGroundDustParticles() {
-	// 	groundDustParticles.GetComponent<ParticleSystem>().Play();
-	// }
+	[ClientRpc]
+	private void ClientHandleLandingAnim() {
+		animationScript.HandleLandingAnim();
+	}
 
-	// [Command]
-	// private void CmdPlayWallDustParticles() {
-	// 	ClientPlayWallDustParticles();
-	// }
+	[Command]
+	private void CmdHandleGroundDustAnim() {
+		ClientHandleGroundDustAnim();
+	}
 
-	// [ClientRpc]
-	// private void ClientPlayWallDustParticles() {
-	// 	wallDustParticles.GetComponent<ParticleSystem>().Play();
-	// }
+	[ClientRpc]
+	private void ClientHandleGroundDustAnim() {
+		animationScript.HandleGroundDustAnim();
+	}
+
+	[Command]
+	private void CmdHandleFallingAnim() {
+		ClientHandleFallingAnim();
+	}
+
+	[ClientRpc]
+	private void ClientHandleFallingAnim() {
+		animationScript.HandleFallingAnim();
+	}
+
+	[Command]
+	private void CmdHandleMovementAnim() {
+		ClientHandleMovementAnim();
+	}
+
+	[ClientRpc]
+	private void ClientHandleMovementAnim() {
+		animationScript.HandleMovementAnim();
+	}
+
+	[Command]
+	private void CmdHandleJumpAnim() {
+		ClientHandleJumpAnim();
+	}
+
+	[ClientRpc]
+	private void ClientHandleJumpAnim() {
+		animationScript.HandleJumpAnim();
+	}
+
+	[Command]
+	private void CmdHandleWallSlideAnim() {
+		ClientHandleWallSlideAnim();
+	}
+
+	[ClientRpc]
+	private void ClientHandleWallSlideAnim() {
+		animationScript.HandleWallSlideAnim();
+	}
+
 
 	// checks if the small groundcheck collision box below player is triggered.
-	private bool GetHasLanded() {
-		return groundCheckScript.GetHasLanded();
+	private bool GetIsTouchingGround() {
+		return groundCheckScript.GetIsTouchingGround();
 	}
 	
-	private void SetHasLanded(bool b) {
-		groundCheckScript.SetHasLanded(b);
+	private void SetIsTouchingGround(bool b) {
+		groundCheckScript.SetIsTouchingGround(b);
 	}
+
+
+
+	// private bool GetHasLanded() {
+	// 	return groundCheckScript.GetHasLanded();
+	// }
+	
+	// private void SetHasLanded(bool b) {
+	// 	groundCheckScript.SetHasLanded(b);
+	// }
 
 	private bool GetHasLeftGround() {
 		return groundCheckScript.GetHasLeftGround();

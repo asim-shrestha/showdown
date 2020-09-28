@@ -4,20 +4,29 @@ using UnityEngine;
 
 public class GroundCheck : MonoBehaviour
 {
-	public bool hasLanded;
+	public bool isTouchingGround;
 	public bool hasLeftGround;
 	
 	void Start() {
-		hasLanded = false;
+		isTouchingGround = false;
 		hasLeftGround = false;
 	}
 
-	public bool GetHasLanded() {
-		return hasLanded;
+	// public bool GetHasLanded() {
+	// 	return hasLanded;
+	// }
+
+	// public void SetHasLanded(bool b) {
+	// 	hasLanded = b;
+	// }
+
+
+	public bool GetIsTouchingGround() {
+		return isTouchingGround;
 	}
 
-	public void SetHasLanded(bool b) {
-		hasLanded = b;
+	public void SetIsTouchingGround(bool b) {
+		isTouchingGround = b;
 	}
 
 	public bool GetHasLeftGround() {
@@ -28,14 +37,15 @@ public class GroundCheck : MonoBehaviour
 		hasLeftGround = b;
 	}
 
-	void OnTriggerEnter2D(Collider2D other) {
+	void OnTriggerStay2D(Collider2D other) {
 		if (other.gameObject.layer == LayerMask.NameToLayer ("Ground")) {
-			hasLanded = true;
+			isTouchingGround = true;
 		}
 	}
 
 	void OnTriggerExit2D(Collider2D other) {
 		if (other.gameObject.layer == LayerMask.NameToLayer ("Ground")) {
+			isTouchingGround = false;
 			hasLeftGround = true;
 		}
 	}
