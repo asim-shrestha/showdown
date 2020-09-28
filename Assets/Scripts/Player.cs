@@ -16,23 +16,25 @@ public class Player : NetworkBehaviour {
 	bool isGrounded;
 	float dirFacing;
 
-	// GameObject instead of particle system to pass into a server command
-	[SerializeField] private GameObject groundDustParticles;
-	[SerializeField] private GameObject wallDustParticles;
+
 	
 	// Ground and wall checks are performed with the following gameobjects.
 	[SerializeField] private GameObject GroundCheck;
 	private GroundCheck groundCheckScript;
 	[SerializeField] private GameObject WallCheck;
 	private WallCheck wallCheckScript;
+	[SerializeField] private GameObject Animation;
+	private PlayerAnimation animationScript;
 
 	private Rigidbody2D rb;
 	private BoxCollider2D boxCollider;
+		
 
 	// Start is called before the first frame update
 	void Start() {
 		rb = GetComponent<Rigidbody2D>();
 		boxCollider = GetComponent<BoxCollider2D>();
+
 		jumpsAvailable = maxJumps;
 		isFalling = true;
 		dirFacing = 1;
@@ -40,7 +42,8 @@ public class Player : NetworkBehaviour {
 		//load scripts from groundCheck and WallCheck gameobjects
 		groundCheckScript = GroundCheck.GetComponent<GroundCheck>();
 		wallCheckScript = WallCheck.GetComponent<WallCheck>();
-
+		animationScript = Animation.GetComponent<PlayerAnimation>();
+		
 		ConnectClientToCamera();
 		DisablePhysicsIfOtherPlayer();
 	}
@@ -75,10 +78,11 @@ public class Player : NetworkBehaviour {
 	private void detectLanding() {
 		if (GetHasLanded()) {
 			jumpsAvailable = maxJumps;
-			CmdPlayGroundDustParticles();
+			// CmdPlayGroundDustParticles();
 			SetHasLanded(false);
 			isFalling = false;
 			isGrounded = true;
+			// animator.Play("PlayerIdle");
 		} 
 	}
 
@@ -96,15 +100,11 @@ public class Player : NetworkBehaviour {
 		Vector2 movementVector = new Vector2(Input.GetAxisRaw("Horizontal") * movementSpeed, rb.velocity.y);
 		rb.velocity = movementVector;
 		turnPlayer();
+		animationScript.HandleMovementAnim();
 	}
 
 	private void turnPlayer() {
-		if (Input.GetAxisRaw("Horizontal") == 1f) {
-			dirFacing = 1f;
-		} 
-		else if (Input.GetAxisRaw("Horizontal") == -1f) {
-			dirFacing = -1f;
-		}
+		dirFacing = Input.GetAxisRaw("Horizontal");
 		transform.localScale = new Vector3(dirFacing, 1f, 1f);
 	}
 
@@ -124,6 +124,8 @@ public class Player : NetworkBehaviour {
 				}
 			}
 			jumpsAvailable--;
+			// animator.Play("PlayerJump");
+			animationScript.HandleJumpAnim();
 		}
 	}
 
@@ -131,7 +133,7 @@ public class Player : NetworkBehaviour {
 		// if player is moving  onto a  wall or moving right onto a right wall, wall sliding will activate.
 		if (rb.velocity.y < wallSlideTriggerVelocity && !isGrounded) {
 			if (GetIsTouchingWall() && Input.GetAxisRaw("Horizontal") == dirFacing) {
-				CmdPlayWallDustParticles();
+				animationScript.HandleWallSlideAnim();
 				isFalling = false;
 				jumpsAvailable = 1;
 				if (rb.velocity.y < wallSlideVelocity) {
@@ -143,25 +145,25 @@ public class Player : NetworkBehaviour {
 	}
 
 	// Run on server so every player can see the dust particles
-	[Command]
-	private void CmdPlayGroundDustParticles() {
-		ClientPlayGroundDustParticles();
-	}
+	// [Command]
+	// private void CmdPlayGroundDustParticles() {
+	// 	ClientPlayGroundDustParticles();
+	// }
 
-	[ClientRpc]
-	private void ClientPlayGroundDustParticles() {
-		groundDustParticles.GetComponent<ParticleSystem>().Play();
-	}
+	// [ClientRpc]
+	// private void ClientPlayGroundDustParticles() {
+	// 	groundDustParticles.GetComponent<ParticleSystem>().Play();
+	// }
 
-	[Command]
-	private void CmdPlayWallDustParticles() {
-		ClientPlayWallDustParticles();
-	}
+	// [Command]
+	// private void CmdPlayWallDustParticles() {
+	// 	ClientPlayWallDustParticles();
+	// }
 
-	[ClientRpc]
-	private void ClientPlayWallDustParticles() {
-		wallDustParticles.GetComponent<ParticleSystem>().Play();
-	}
+	// [ClientRpc]
+	// private void ClientPlayWallDustParticles() {
+	// 	wallDustParticles.GetComponent<ParticleSystem>().Play();
+	// }
 
 	// checks if the small groundcheck collision box below player is triggered.
 	private bool GetHasLanded() {
