@@ -16,15 +16,11 @@ public class Player : NetworkBehaviour {
 	bool isGrounded;
 	float dirFacing;
 
-	// [SerializeField] private GameObject groundDustParticles;
-	// [SerializeField] private GameObject wallDustParticles;
-
 	// Ground and wall checks are performed with the following gameobjects.
 	[SerializeField] private GameObject GroundCheck;
 	private GroundCheck groundCheckScript;
 	[SerializeField] private GameObject WallCheck;
 	private WallCheck wallCheckScript;
-
 
 	[SerializeField] private GameObject Animation;
 	private PlayerAnimation animationScript;
@@ -70,6 +66,7 @@ public class Player : NetworkBehaviour {
 	// Update is called once per frame
 	void Update() {
 		if (hasAuthority) {
+			fixMovementAnim();
 			detectLanding();
 			detectFalling();
 			handleJump();
@@ -78,29 +75,43 @@ public class Player : NetworkBehaviour {
 		}
 	}
 
+	// There is a bug when an arrow key and jump is pressed simultaneously, the animation overrides to walking when it should be jumping. 
+	// The following code fixes this issue to a large extent.
+	private void fixMovementAnim() {
+		if (!GetIsTouchingGround()) {
+			CmdFixMovementAnim();
+		}
+	}
+
+	// On every frame that player is touching the ground, reset the available jumps to max, set isFalling flag to false, and set isGrounded flag to true.
+	// isGrounded flag is checked to play the landing animation on the first frame that player lands on ground. The flag is then immediately set to false to avoid replaying the animation.
 	private void detectLanding() {
 		if (GetIsTouchingGround()) {
 			if (!isGrounded) {
-				CmdHandleGroundDustAnim();
 				CmdHandleLandingAnim();
 			}
 			jumpsAvailable = maxJumps;
 			isFalling = false;
-			isGrounded = true;
-			
+			isGrounded = true;	
 		} 
 	}
 
 	private void detectFalling() {
+		// Two different animations visually signals to the player whether he/she has any jumps left.
+		if (isFalling && jumpsAvailable >= 1) {
+			CmdHandleJumpingAnim();
+		} 
+		else if (isFalling && jumpsAvailable < 1) {
+			CmdHandleFallingAnim();
+		}
+
+		// Checks whether the isFalling flag should be set to true. IsFalling flag is checked while jumping to determine if available jumps need to be decremented.
 		if ((!isFalling && GetHasLeftGround() && rb.velocity.y < jumpDecrementThresholdVelocity) ||
 			(!isFalling && GetHasPushedOffWall() && rb.velocity.y < jumpDecrementThresholdVelocity+wallSlideVelocity)) {
 			isFalling = true;
 			isGrounded = false;
 			SetHasLeftGround(false);
 			SetHasPushedOffWall(false);
-		}
-		if (isFalling) {
-			CmdHandleFallingAnim();
 		}
 	}
 
@@ -129,25 +140,34 @@ public class Player : NetworkBehaviour {
 			Vector2 jumpVelocity = new Vector2(rb.velocity.x, jumpSpeed);
 			rb.velocity = jumpVelocity;
 			isGrounded = false;
+
+			// check if player is falling, if so, decrement available jumps and play flipping animation, then set isFalling to false.
 			if (isFalling) {
+				CmdHandleFlippingAnim();
 				jumpsAvailable--;
 				isFalling = false;
 				if (jumpsAvailable <= 0) {
 					return;
 				}
 			}
+			
+			// Choose which animation to play depending on how many jumps are available.
+			if (jumpsAvailable == 2) {
+				CmdHandleJumpingAnim();
+			}
+			else if (jumpsAvailable == 1) {
+				CmdHandleFlippingAnim();
+			}
+
 			jumpsAvailable--;
-			CmdHandleJumpAnim();
-			// animator.Play("PlayerJump");
 		}
 	}
 
 	private void handleWallSlide() {
-		// if player is moving  onto a  wall or moving right onto a right wall, wall sliding will activate.
+		// if player is moving into a wall, wall sliding will activate.
 		if (rb.velocity.y < wallSlideTriggerVelocity && !isGrounded) {
 			if (GetIsTouchingWall() && Input.GetAxisRaw("Horizontal") == dirFacing) {
-				// CmdPlayWallDustParticles();
-				CmdHandleWallSlideAnim();
+				CmdHandleWallSlidingAnim();
 				isFalling = false;
 				jumpsAvailable = 1;
 				if (rb.velocity.y < wallSlideVelocity) {
@@ -162,27 +182,15 @@ public class Player : NetworkBehaviour {
 	private void CmdHandleLandingAnim() {
 		ClientHandleLandingAnim();
 	}
-
 	[ClientRpc]
 	private void ClientHandleLandingAnim() {
 		animationScript.HandleLandingAnim();
 	}
 
 	[Command]
-	private void CmdHandleGroundDustAnim() {
-		ClientHandleGroundDustAnim();
-	}
-
-	[ClientRpc]
-	private void ClientHandleGroundDustAnim() {
-		animationScript.HandleGroundDustAnim();
-	}
-
-	[Command]
 	private void CmdHandleFallingAnim() {
 		ClientHandleFallingAnim();
 	}
-
 	[ClientRpc]
 	private void ClientHandleFallingAnim() {
 		animationScript.HandleFallingAnim();
@@ -192,30 +200,45 @@ public class Player : NetworkBehaviour {
 	private void CmdHandleMovementAnim() {
 		ClientHandleMovementAnim();
 	}
-
 	[ClientRpc]
 	private void ClientHandleMovementAnim() {
 		animationScript.HandleMovementAnim();
 	}
 
 	[Command]
-	private void CmdHandleJumpAnim() {
-		ClientHandleJumpAnim();
+	private void CmdFixMovementAnim() {
+		ClientFixMovementAnim();
 	}
-
 	[ClientRpc]
-	private void ClientHandleJumpAnim() {
-		animationScript.HandleJumpAnim();
+	private void ClientFixMovementAnim() {
+		animationScript.FixMovementAnim();
 	}
 
 	[Command]
-	private void CmdHandleWallSlideAnim() {
-		ClientHandleWallSlideAnim();
+	private void CmdHandleJumpingAnim() {
+		ClientHandleJumpingAnim();
+	}
+	[ClientRpc]
+	private void ClientHandleJumpingAnim() {
+		animationScript.HandleJumpingAnim();
 	}
 
+	[Command]
+	private void CmdHandleFlippingAnim() {
+		ClientHandleFlippingAnim();
+	}
 	[ClientRpc]
-	private void ClientHandleWallSlideAnim() {
-		animationScript.HandleWallSlideAnim();
+	private void ClientHandleFlippingAnim() {
+		animationScript.HandleFlippingAnim();
+	}
+
+	[Command]
+	private void CmdHandleWallSlidingAnim() {
+		ClientHandleWallSlidingAnim();
+	}
+	[ClientRpc]
+	private void ClientHandleWallSlidingAnim() {
+		animationScript.HandleWallSlidingAnim();
 	}
 
 
@@ -227,16 +250,6 @@ public class Player : NetworkBehaviour {
 	private void SetIsTouchingGround(bool b) {
 		groundCheckScript.SetIsTouchingGround(b);
 	}
-
-
-
-	// private bool GetHasLanded() {
-	// 	return groundCheckScript.GetHasLanded();
-	// }
-	
-	// private void SetHasLanded(bool b) {
-	// 	groundCheckScript.SetHasLanded(b);
-	// }
 
 	private bool GetHasLeftGround() {
 		return groundCheckScript.GetHasLeftGround();

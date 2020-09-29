@@ -12,15 +12,6 @@ public class GroundCheck : MonoBehaviour
 		hasLeftGround = false;
 	}
 
-	// public bool GetHasLanded() {
-	// 	return hasLanded;
-	// }
-
-	// public void SetHasLanded(bool b) {
-	// 	hasLanded = b;
-	// }
-
-
 	public bool GetIsTouchingGround() {
 		return isTouchingGround;
 	}

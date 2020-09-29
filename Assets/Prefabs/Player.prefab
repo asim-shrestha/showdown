@@ -142,7 +142,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fbd30fd0411cc3848b3f8fdfb39f4a17, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hasLanded: 0
+  isTouchingGround: 0
   hasLeftGround: 0
 --- !u!1 &5349741901730615679
 GameObject:
@@ -303,7 +303,7 @@ MonoBehaviour:
   jumpsAvailable: 0
   jumpDecrementThresholdVelocity: -3
   wallSlideTriggerVelocity: 0.2
-  wallSlideVelocity: -0.2
+  wallSlideVelocity: -0.4
   GroundCheck: {fileID: 3689264963522906753}
   WallCheck: {fileID: 2882895677230905950}
   Animation: {fileID: 7474321222603898792}

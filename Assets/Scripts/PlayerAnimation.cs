@@ -17,49 +17,51 @@ public class PlayerAnimation : MonoBehaviour
 		animator.Play("PlayerIdle");
 	}
 
-	// Update is called once per frame
-	void Update()
-	{
-	}
-
 	public void HandleLandingAnim() {
 		animator.Play("PlayerIdle");
-	}
-
-	public void HandleGroundDustAnim() {
 		groundDustParticles.GetComponent<ParticleSystem>().Play();
 	}
 
 	public void HandleFallingAnim() {
-		animator.Play("PlayerFall");
+		if (!animator.GetCurrentAnimatorStateInfo(0).IsName("PlayerJump") &&
+			!animator.GetCurrentAnimatorStateInfo(0).IsName("PlayerFlip")) {
+			animator.Play("PlayerFall");
+		}
 	}
 
 	public void HandleMovementAnim() {
-		if (Input.GetAxisRaw("Horizontal") != 0) {
-			if (!isAnimInAction()) {
+		if (!isAnimInAction()) {
+			if (Input.GetAxisRaw("Horizontal") != 0) {
 				animator.Play("PlayerWalk");
 			}
-		}
-		else {
-			if (!isAnimInAction()) {
+			else {
 				animator.Play("PlayerIdle");
 			}
+		}
+	}
+
+	public void FixMovementAnim() {
+		if (animator.GetCurrentAnimatorStateInfo(0).IsName("PlayerWalk")) {
+			animator.Play("PlayerJump");
 		}
 	}
 
 	private bool isAnimInAction() {
 		return animator.GetCurrentAnimatorStateInfo(0).IsName("PlayerJump") || 
 			animator.GetCurrentAnimatorStateInfo(0).IsName("PlayerWallSlide") ||
-			animator.GetCurrentAnimatorStateInfo(0).IsName("PlayerFall");
-			
-		
+			animator.GetCurrentAnimatorStateInfo(0).IsName("PlayerFall") ||
+			animator.GetCurrentAnimatorStateInfo(0).IsName("PlayerFlip");
 	}
 
-	public void HandleJumpAnim() {
+	public void HandleJumpingAnim() {
 		animator.Play("PlayerJump");
 	}
 
-	public void HandleWallSlideAnim() {
+	public void HandleFlippingAnim() {
+		animator.Play("PlayerFlip");
+	}
+
+	public void HandleWallSlidingAnim() {
 		wallDustParticles.GetComponent<ParticleSystem>().Play();
 		animator.Play("PlayerWallSlide");
 	}
