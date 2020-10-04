@@ -66,20 +66,22 @@ public class Player : NetworkBehaviour {
 	// Update is called once per frame
 	void Update() {
 		if (hasAuthority) {
-			fixMovementAnim();
 			detectLanding();
 			detectFalling();
 			handleJump();
 			handleWallSlide();
 			handleMovement();
+			handleOnGroundAnim();
 		}
 	}
 
-	// There is a bug when an arrow key and jump is pressed simultaneously, the animation overrides to walking when it should be jumping. 
-	// The following code fixes this issue to a large extent.
-	private void fixMovementAnim() {
-		if (!GetIsTouchingGround()) {
-			CmdFixMovementAnim();
+	private void handleOnGroundAnim() {
+		if (GetIsTouchingGround()) {
+			if (rb.velocity.x != 0) {
+				CmdHandleWalkingAnim();
+			} else {
+				CmdHandleIdleAnim();
+			}
 		}
 	}
 
@@ -98,12 +100,9 @@ public class Player : NetworkBehaviour {
 
 	private void detectFalling() {
 		// Two different animations visually signals to the player whether he/she has any jumps left.
-		if (isFalling && jumpsAvailable >= 1) {
+		if (isFalling) {
 			CmdHandleJumpingAnim();
 		} 
-		else if (isFalling && jumpsAvailable < 1) {
-			CmdHandleFallingAnim();
-		}
 
 		// Checks whether the isFalling flag should be set to true. IsFalling flag is checked while jumping to determine if available jumps need to be decremented.
 		if ((!isFalling && GetHasLeftGround() && rb.velocity.y < jumpDecrementThresholdVelocity) ||
@@ -124,7 +123,6 @@ public class Player : NetworkBehaviour {
 		else {
 			rb.velocity = new Vector2(0, rb.velocity.y);
 		}
-		CmdHandleMovementAnim();
 	}
 
 	private void turnPlayer() {
@@ -175,6 +173,9 @@ public class Player : NetworkBehaviour {
 					rb.velocity = slideVelocity;
 				}
 			}
+			else {
+				CmdHandleJumpingAnim();
+			}
 		}
 	}
 
@@ -188,30 +189,21 @@ public class Player : NetworkBehaviour {
 	}
 
 	[Command]
-	private void CmdHandleFallingAnim() {
-		ClientHandleFallingAnim();
+	private void CmdHandleIdleAnim() {
+		ClientHandleIdleAnim();
 	}
 	[ClientRpc]
-	private void ClientHandleFallingAnim() {
-		animationScript.HandleFallingAnim();
+	private void ClientHandleIdleAnim() {
+		animationScript.HandleIdleAnim();
 	}
 
 	[Command]
-	private void CmdHandleMovementAnim() {
-		ClientHandleMovementAnim();
+	private void CmdHandleWalkingAnim() {
+		ClientHandleWalkingAnim();
 	}
 	[ClientRpc]
-	private void ClientHandleMovementAnim() {
-		animationScript.HandleMovementAnim();
-	}
-
-	[Command]
-	private void CmdFixMovementAnim() {
-		ClientFixMovementAnim();
-	}
-	[ClientRpc]
-	private void ClientFixMovementAnim() {
-		animationScript.FixMovementAnim();
+	private void ClientHandleWalkingAnim() {
+		animationScript.HandleWalkingAnim();
 	}
 
 	[Command]

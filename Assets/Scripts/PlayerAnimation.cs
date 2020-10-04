@@ -22,21 +22,15 @@ public class PlayerAnimation : MonoBehaviour
 		groundDustParticles.GetComponent<ParticleSystem>().Play();
 	}
 
-	public void HandleFallingAnim() {
-		if (!animator.GetCurrentAnimatorStateInfo(0).IsName("PlayerJump") &&
-			!animator.GetCurrentAnimatorStateInfo(0).IsName("PlayerFlip")) {
-			animator.Play("PlayerFall");
+	public void HandleWalkingAnim() {
+		if (!isAnimInAction()) {
+			animator.Play("PlayerWalk");
 		}
 	}
 
-	public void HandleMovementAnim() {
+	public void HandleIdleAnim() {
 		if (!isAnimInAction()) {
-			if (Input.GetAxisRaw("Horizontal") != 0) {
-				animator.Play("PlayerWalk");
-			}
-			else {
-				animator.Play("PlayerIdle");
-			}
+			animator.Play("PlayerIdle");
 		}
 	}
 
